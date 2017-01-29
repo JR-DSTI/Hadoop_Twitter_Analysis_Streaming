@@ -1,6 +1,7 @@
 package dsti
 /**
-  * Created by assansanogo on 21/01/17.
+  * @author ${user.name} Created by assansanogo on 21/01/17.
+  * Assisted by Jonas Rathke
   */
 import org.apache.spark._
 import org.apache.spark.SparkContext
@@ -21,7 +22,7 @@ import twitter4j.auth.{AuthorizationFactory, OAuthAuthorization}
 import twitter4j.conf.ConfigurationBuilder
 
 /**
- * @author ${user.name}
+ *
  */
 
 object Streamer {
@@ -97,7 +98,10 @@ object Streamer {
       //create stream with data that needs to be retrieved
       val stream = TwitterUtils.createStream(streamingSparkContext, Some(auth),filters)
 
-      val s= stream.map(l=>(l.getText(),l.getCreatedAt(),l.getGeoLocation(),l.isRetweeted(),l.getUser(),l.getFavoriteCount()))
+      //define what attributes the tweets need to have
+      val s= stream.map(l=>(l.getUser(),l.getText(),l.getCreatedAt(),l.getGeoLocation(),l.getPlace(), l.isRetweeted(),l.getFavoriteCount(),l.getHashtagEntities))
+
+      //S
       s.saveAsTextFiles("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/");
       // do something
       // pause to avoid churning
