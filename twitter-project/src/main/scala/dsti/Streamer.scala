@@ -210,7 +210,6 @@ object Streamer {
      mytext5.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/")
      //directories= file3.list(my_filter)
 
-<<<<<<< HEAD
       //open own spark streaming tab context
       val streamingSparkContext = new StreamingContext(sc, Seconds(10))
       // streamingSparkContext.start()
@@ -278,8 +277,6 @@ object Streamer {
 
 
 
-=======
->>>>>>> parent of 491ba4e... Merge remote-tracking branch 'origin/master'
      /*for (el <- directories) {
        var mytext3 = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/outZ/" + el.toString())
 
