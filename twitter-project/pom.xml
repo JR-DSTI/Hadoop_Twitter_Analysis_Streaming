@@ -49,6 +49,12 @@
       <version>2.0.M6-SNAP8</version>
       <scope>test</scope>
     </dependency>
+      <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11 -->
+      <dependency>
+          <groupId>org.scalatest</groupId>
+          <artifactId>scalatest_2.11</artifactId>
+          <version>3.0.1</version>
+      </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.10</artifactId>
@@ -71,6 +77,12 @@
           <groupId>edu.stanford.nlp</groupId>
           <artifactId>stanford-corenlp</artifactId>
           <version>3.7.0</version>
+      </dependency>
+      <dependency>
+          <groupId>edu.stanford.nlp</groupId>
+          <artifactId>stanford-corenlp</artifactId>
+          <version>3.7.0</version>
+          <classifier>models</classifier>
       </dependency>
       <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
       <dependency>

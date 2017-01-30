@@ -28,8 +28,13 @@ package dsti
   //import java.Time
   import org.joda.time
   import scala.concurrent._
+
 //corenlp language proccessing:
   import edu.stanford.nlp.simple._
+  import edu.stanford.nlp._
+  import sentiment.SentimentUtils._
+  import org.scalatest.{FunSpec, Matchers}
+
 /**
  *
  */
@@ -50,30 +55,43 @@ object Streamer {
       return arr
     }
 
-    //sentiment analysis:
-    def detectSentiment(message: String): SENTIMENT_TYPE={
+/*    //sentiment analysis over NLP edu.stanford.nlp:
+    def detectSentiment(message: String): nlp.sentiment.type ={ //SENTIMENT_TYPE
+      describe("sentiment analyzer") {
 
-      it("should detect not understood sentiment") {
-        detectSentiment("") should equal (NOT_UNDERSTOOD)
-      }
+        it("should detect not understood sentiment") {
+          detectSentiment("") should equal(NOT_UNDERSTOOD)
+        }
 
-      it("should detect a negative sentiment") {
-        detectSentiment("I am feeling very sad and frustrated.") should equal (NEGATIVE)
-      }
+        it("should detect a negative sentiment") {
+          detectSentiment("I am feeling very sad and frustrated.") should equal(NEGATIVE)
+        }
 
-      it("should detect a neutral sentiment") {
-        detectSentiment("I'm watching a movie") should equal (NEUTRAL)
-      }
+        it("should detect a neutral sentiment") {
+          detectSentiment("I'm watching a movie") should equal(NEUTRAL)
+        }
 
-      it("should detect a positive sentiment") {
-        detectSentiment("It was a nice experience.") should equal (POSITIVE)
-      }
+        it("should detect a positive sentiment") {
+          detectSentiment("It was a nice experience.") should equal(POSITIVE)
+        }
 
-      it("should detect a very positive sentiment") {
-        detectSentiment("It was a very nice experience.") should equal (VERY_POSITIVE)
+        it("should detect a very positive sentiment") {
+          detectSentiment("It was a very nice experience.") should equal(VERY_POSITIVE)
+        }
       }
     }
 
+
+  class SentimentAnalyzerSpec extends FunSpec with Matchers {
+
+    describe("sentiment analyzer") {
+
+      it("should return POSITIVE when input has positive emotion") {
+        val input = "Scala is a great general purpose language."
+        val sentiment = SentimentAnalyzer.mainSentiment(input)
+        sentiment should be(Sentiment.POSITIVE)
+      }
+    }*/
 
 
     def main(args: Array[String]){
@@ -115,7 +133,7 @@ object Streamer {
       //var twitterAuth =  new AuthorizationFactory().
 
 //create a spark stream of twitter here
-      val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("local[2]")
+      val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("local[4]")
       val sc = new SparkContext(config)
 
 //set the log level to WARN to eliminate the noisy log Spark generates
@@ -153,7 +171,7 @@ object Streamer {
           rdd
             .sortBy(_._2)
             .map(x => (x, now))
-            .saveAsTextFile(s"file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Trending/")
+            .saveAsTextFile("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Trending3/")
         }
 
       val tweets = stream.filter {t =>
@@ -162,11 +180,12 @@ object Streamer {
       }
 
       val data = tweets.map { status =>
-        val sentiment = SentimentAnalysisUtils.detectSentiment(status.getText)
+        val sentiment = SentimentUtils.detectSentiment(status.getText)
         val tags2 = status.getHashtagEntities.map(_.getText.toLowerCase)
 
         (status.getText, sentiment.toString, tags)
       }
+
       // do something: pause to avoid churning
       //streamingSparkContext.awaitTermination()
       streamingSparkContext.start()

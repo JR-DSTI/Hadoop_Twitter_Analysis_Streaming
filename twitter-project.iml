@@ -19,6 +19,11 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.specs2:scalaz-concurrent_2.10:7.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.specs2:scalaz-effect_2.10:7.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.scalatest:scalatest_2.10:2.0.M6-SNAP8" level="project" />
+    <orderEntry type="library" name="Maven: org.scalatest:scalatest_2.11:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.scalactic:scalactic_2.11:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-reflect:2.11.8" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang.modules:scala-xml_2.11:1.0.5" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang.modules:scala-parser-combinators_2.11:1.0.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-core_2.10:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-mapred:hadoop2:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-ipc:1.7.7" level="project" />
@@ -133,7 +138,6 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.4.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-scala_2.10:2.4.4" level="project" />
-    <orderEntry type="library" name="Maven: org.scala-lang:scala-reflect:2.10.4" level="project" />
     <orderEntry type="library" name="Maven: com.thoughtworks.paranamer:paranamer:2.6" level="project" />
     <orderEntry type="library" name="Maven: org.apache.ivy:ivy:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: oro:oro:2.0.8" level="project" />
@@ -167,6 +171,7 @@
     <orderEntry type="library" name="Maven: com.googlecode.efficient-java-matrix-library:ejml:0.23" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:2.6.1" level="project" />
+    <orderEntry type="library" name="Maven: edu.stanford.nlp:stanford-corenlp:models:3.7.0" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.9.7" level="project" />
     <orderEntry type="library" name="Maven: org.joda:joda-convert:1.8" level="project" />
   </component>
