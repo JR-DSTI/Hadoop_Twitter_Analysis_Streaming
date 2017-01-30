@@ -1,10 +1,7 @@
 package dsti
 /**
-  * @author ${user.name}
   * Created by assansanogo on 21/01/17.
-  * Assisted by Jonas Rathke
   */
-
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.regex.Pattern
@@ -30,35 +27,8 @@ import org.apache.log4j
 import twitter4j.auth.{AuthorizationFactory, OAuthAuthorization}
 import twitter4j.conf.ConfigurationBuilder
 
-//Apache imports
-  import org.apache.spark._
-  import org.apache.spark.SparkContext
-  import org.apache.spark.SparkContext._
-  import org.apache.spark.SparkConf
-  import org.apache.spark.streaming._
-  import org.apache.spark.streaming.StreamingContext
-  import org.apache.spark.streaming.twitter.TwitterUtils
-  import org.apache.log4j
-  //import org.apache.hive._
-
-//Twitter imports
-  import twitter4j._
-  import twitter4j.auth.AuthorizationFactory._
-  import Twitter._
-
-
-//import org.apache.logging
-  import twitter4j.auth.{AuthorizationFactory, OAuthAuthorization}
-  import twitter4j.conf.ConfigurationBuilder
-
-//MISC
-  //import java.Time
-  import org.joda.time
-  import scala.concurrent._
-//corenlp language proccessing:
-  import edu.stanford.nlp.simple._
 /**
- *
+ * @author ${user.name}
  */
 
 object Streamer {
@@ -163,30 +133,6 @@ object Streamer {
     }
     //close all operations gracefully
 
-    //sentiment analysis:
-    def detectSentiment(message: String): SENTIMENT_TYPE={
-
-      it("should detect not understood sentiment") {
-        detectSentiment("") should equal (NOT_UNDERSTOOD)
-      }
-
-      it("should detect a negative sentiment") {
-        detectSentiment("I am feeling very sad and frustrated.") should equal (NEGATIVE)
-      }
-
-      it("should detect a neutral sentiment") {
-        detectSentiment("I'm watching a movie") should equal (NEUTRAL)
-      }
-
-      it("should detect a positive sentiment") {
-        detectSentiment("It was a nice experience.") should equal (POSITIVE)
-      }
-
-      it("should detect a very positive sentiment") {
-        detectSentiment("It was a very nice experience.") should equal (VERY_POSITIVE)
-      }
-    }
-
 
     timerStreamMin(10,"m")
     streamingSparkContext.stop(false, true)
@@ -221,16 +167,9 @@ object Streamer {
     }
 
 
-
     //List all the directories in a given path
     var fileInput: String ="/Users/assansanogo/Downloads/pre/"
     var directories: Array[String]=listMyFolders(fileInput)
-
-//create OAuth for twitter access
-
-      val auth = new OAuthAuthorization(bc.build)
-
-
 
 
     for (el <- directories) {
@@ -240,16 +179,7 @@ object Streamer {
        .map(l => l.split("    "))
        .map(l => l(0)).map(l => cleantweets(l))
 
-//create a spark stream of twitter here
-      val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("local[2]")
-      val sc = new SparkContext(config)
-
-//set the log level to WARN to eliminate the noisy log Spark generates
-      sc.setLogLevel("WARN")
-
-
        mytext = mytext.map(l => l.replaceAll(pattern4, "").trim())
-
 
       //save the file as a
         mytext
@@ -346,12 +276,12 @@ object Streamer {
       streamingSparkContext.stop(false,true)
 
 
+
      /*for (el <- directories) {
        var mytext3 = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/outZ/" + el.toString())
 
        file3.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/"+ DateTime.now().toString())
      }*/
-
 
 
 
@@ -371,7 +301,4 @@ object Streamer {
     // 43985647-tWJwBvJegg6jwzTJDVSmHPtuwcryJJYgwwhwug5oM
 
 
-
-
-}
 

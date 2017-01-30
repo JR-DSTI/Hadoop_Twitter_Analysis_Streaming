@@ -68,6 +68,7 @@
       <version>1.6.0</version>
     </dependency>
 
+
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-streaming_2.10</artifactId>
@@ -79,24 +80,7 @@
       <artifactId>spark-streaming-twitter_2.10</artifactId>
       <version>1.6.0</version>
     </dependency>
-      <!-- https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp -->
-      <dependency>
-          <groupId>edu.stanford.nlp</groupId>
-          <artifactId>stanford-corenlp</artifactId>
-          <version>3.7.0</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
-      <dependency>
-          <groupId>joda-time</groupId>
-          <artifactId>joda-time</artifactId>
-          <version>2.9.7</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.joda/joda-convert -->
-      <dependency>
-          <groupId>org.joda</groupId>
-          <artifactId>joda-convert</artifactId>
-          <version>1.8</version>
-      </dependency>
+
 
   </dependencies>
 
