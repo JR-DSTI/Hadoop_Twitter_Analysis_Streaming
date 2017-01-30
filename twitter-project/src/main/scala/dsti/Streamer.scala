@@ -343,6 +343,7 @@ object Streamer {
 
       // do something: pause to avoid churning
       //streamingSparkContext.awaitTermination()
+    //blablabla
       streamingSparkContext.start()
 
       //set the current time
