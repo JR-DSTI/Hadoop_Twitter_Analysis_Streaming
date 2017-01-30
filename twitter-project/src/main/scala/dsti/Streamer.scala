@@ -28,8 +28,8 @@ import twitter4j.auth.{AuthorizationFactory, OAuthAuthorization}
 import twitter4j.conf.ConfigurationBuilder
 
 /**
- * @author ${user.name}
- */
+  * @author ${user.name}
+  */
 
 object Streamer {
 
@@ -117,7 +117,7 @@ object Streamer {
       var t_end: Long=0
       //if the timeScale is in hours ex: 1 hour of Streaming
       if(timeScale=="h"){
-      t_end= t_s + a *3600*1000
+        t_end= t_s + a *3600*1000
       }
       //if the timeScale is in minutes ex: 1 min of streaming
       else if(timeScale == "m") {
@@ -125,7 +125,7 @@ object Streamer {
       }
       //if the timeScale is in seconds ex: 1 sec of streaming
       else if (timeScale == "s"){
-         t_end = t_s +a *1000
+        t_end = t_s +a *1000
       }
       //loop that gets executed for the timeScale (preselected)
       while (System.currentTimeMillis() < t_end) {
@@ -170,135 +170,68 @@ object Streamer {
     //List all the directories in a given path
     var fileInput: String ="/Users/assansanogo/Downloads/pre/"
     var directories: Array[String]=listMyFolders(fileInput)
-
+    //
 
     for (el <- directories) {
       var pattern4: String = "(http.*)"
       var mytext = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/pre/" + el.toString()).map(l => (l._2))
-       .map(l => l.replace("|", "    "))
-       .map(l => l.split("    "))
-       .map(l => l(0)).map(l => cleantweets(l))
+        .map(l => l.replace("|", "    "))
+        .map(l => l.split("    "))
+        .map(l => l(0)).map(l => cleantweets(l))
 
-       mytext = mytext.map(l => l.replaceAll(pattern4, "").trim())
+      mytext = mytext.map(l => l.replaceAll(pattern4, "").trim())
 
       //save the file as a
-        mytext
-          .saveAsTextFile("file:///Users/assansanogo/Downloads/outX/" + DateTime.now().toString())
+      mytext
+        .saveAsTextFile("file:///Users/assansanogo/Downloads/outX/" + DateTime.now().toString())
 
-        mytext
-          .map(l => l.split("\\s").mkString("_")).map(l => l.split("_").filter(l => l.contains("#")).mkString(" ")).map(l => l.replace("\\.*", ""))
-          .saveAsTextFile("file:///Users/assansanogo/Downloads/outY/" + DateTime.now().toString())
-   }
+      mytext
+        .map(l => l.split("\\s").mkString("_")).map(l => l.split("_").filter(l => l.contains("#")).mkString(" ")).map(l => l.replace("\\.*", ""))
+        .saveAsTextFile("file:///Users/assansanogo/Downloads/outY/" + DateTime.now().toString())
+    }
 
     fileInput = "/Users/assansanogo/Downloads/outY/"
     directories = listMyFolders(fileInput)
 
-     for (el <- directories) {
-        var mytext3 = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/outY/" + el.toString()).map(l=>l._2).
-          map(l=>l.split("\\s").filter(l=>l.startsWith("#")).mkString(","))
-          .flatMap(l=>l.split(","))
+    for (el <- directories) {
+      var mytext3 = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/outY/" + el.toString()).map(l=>l._2).
+        map(l=>l.split("\\s").filter(l=>l.startsWith("#")).mkString(","))
+        .flatMap(l=>l.split(","))
 
-        var uniqueKey = UUID.randomUUID()
-          mytext3.saveAsTextFile("file:///Users/assansanogo/Downloads/outZ/" + uniqueKey.toString())
-     }
-
-     //var file3 = new File("/Users/assansanogo/Downloads/outZ/")
-     //directories= file3.list(my_filter)
-     var  mytext4= sc.textFile("/Users/assansanogo/Downloads/outZ/*/part*")
-     var myString= mytext4.collect()
-     var mytext5=sc.parallelize(myString)
-     mytext5.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/")
-     //directories= file3.list(my_filter)
-
-      //open own spark streaming tab context
-      val streamingSparkContext = new StreamingContext(sc, Seconds(10))
-      // streamingSparkContext.start()
-      var filters: Array[String]= new Array[String](10)
-      filters(1)= "#Trump"
-      //filters(2)="#MachineLearning"
-      //filters(3)="#BigData"
-
-      //create stream with data that needs to be retrieved
-//      val stream = TwitterUtils.createStream(streamingSparkContext, Some(auth),filters) // w/ filters
-// w/o filters (for trendsearch)
-      val stream = TwitterUtils.createStream(streamingSparkContext, None)
-
-      //define what attributes the tweets need to have
-      //val s= stream.map(l=>(l.getUser(),l.getText(),l.getCreatedAt(),l.getGeoLocation(),l.getPlace(), l.isRetweeted(),l.getFavoriteCount(),l.getHashtagEntities))
-      val tags = stream.flatMap { status =>
-        status.getHashtagEntities.map(_.getText)
-      }
-
-
-      //Local path to save the text files:
-      //s.saveAsTextFiles("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/");
-
-      tags.countByValue()
-        .foreachRDD { rdd =>
-          val now = org.joda.time.DateTime.now()
-          rdd
-            .sortBy(_._2)
-            .map(x => (x, now))
-            .saveAsTextFile(s"file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Trending/")
-        }
-
-      val tweets = stream.filter {t =>
-        val tags2 = t.getText.split(" ").filter(_.startsWith("#")).map(_.toLowerCase)
-        tags2.contains("#bigdata") && tags2.contains("#food")
-      }
-
-      val data = tweets.map { status =>
-        val sentiment = SentimentAnalysisUtils.detectSentiment(status.getText)
-        val tags2 = status.getHashtagEntities.map(_.getText.toLowerCase)
-
-        (status.getText, sentiment.toString, tags)
-      }
-      // do something: pause to avoid churning
-      //streamingSparkContext.awaitTermination()
-    //blablabla
-    //blabla
-      streamingSparkContext.start()
-
-      //set the current time
-      var t_s:Long = System.currentTimeMillis();
-
-      //set the end time of the stream analysis
-      var t_end:Long = t_s+60000;
-
-
-      //Wait until t_end has passed:
-//      possibly changable via: Thread.sleep(60000)
-      while(System.currentTimeMillis() < t_end) {
-
-      }
-
-      //close all operations gracefully
-      streamingSparkContext.stop(false,true)
-
-
-
-     /*for (el <- directories) {
-       var mytext3 = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/outZ/" + el.toString())
-
-       file3.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/"+ DateTime.now().toString())
-     }*/
-
-
-
+      var uniqueKey = UUID.randomUUID()
+      mytext3.saveAsTextFile("file:///Users/assansanogo/Downloads/outZ/" + uniqueKey.toString())
     }
+
+    //var file3 = new File("/Users/assansanogo/Downloads/outZ/")
+    //directories= file3.list(my_filter)
+    var  mytext4= sc.textFile("/Users/assansanogo/Downloads/outZ/*/part*")
+    var myString= mytext4.collect()
+    var mytext5=sc.parallelize(myString)
+    mytext5.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/")
+    //directories= file3.list(my_filter)
+
+    /*for (el <- directories) {
+      var mytext3 = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/outZ/" + el.toString())
+
+      file3.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/"+ DateTime.now().toString())
+    }*/
+
+
+
+  }
 
 }
 
-       //var conf1 = new SparkConf().setAppName("pre2").setMaster("local")
-       //var sc  = new SparkContext(conf1)
-       //var mytext=sc.textFile("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/2017_01_28_Test_Twitterproject.txt")
-       //Take all lines of Textfile:
-       //mytext.saveAsTextFile("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/")
+//var conf1 = new SparkConf().setAppName("pre2").setMaster("local")
+//var sc  = new SparkContext(conf1)
+//var mytext=sc.textFile("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/2017_01_28_Test_Twitterproject.txt")
+//Take all lines of Textfile:
+//mytext.saveAsTextFile("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/")
 
-    // Access token
-    // YYkVU1DTSmomoQqLVwk1UropLV65fheRDscgHvXPPAQmZ
-    // Secret access token
-    // 43985647-tWJwBvJegg6jwzTJDVSmHPtuwcryJJYgwwhwug5oM
+// Access token
+// YYkVU1DTSmomoQqLVwk1UropLV65fheRDscgHvXPPAQmZ
+// Secret access token
+// 43985647-tWJwBvJegg6jwzTJDVSmHPtuwcryJJYgwwhwug5oM
 
 
 
