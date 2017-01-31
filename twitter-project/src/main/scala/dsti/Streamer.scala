@@ -91,7 +91,7 @@ object Streamer {
     //var b = new bclass()
     //setup all parts of the twitter sentiment
 
-    //insert twitter credentials:
+    //insert twitter credentials of Jonas:
     //"consumerKey"
     val consumerKey = "dS4yzE7tzvxD9cfrLCjjf8z6c"
     //"consumerSecret"
@@ -168,42 +168,6 @@ object Streamer {
     }
     //close all operations gracefully
 
-/*    //sentiment analysis over NLP edu.stanford.nlp:
-    def detectSentiment(message: String): nlp.sentiment.type ={ //SENTIMENT_TYPE
-      describe("sentiment analyzer") {
-
-        it("should detect not understood sentiment") {
-          detectSentiment("") should equal(NOT_UNDERSTOOD)
-        }
-
-        it("should detect a negative sentiment") {
-          detectSentiment("I am feeling very sad and frustrated.") should equal(NEGATIVE)
-        }
-
-        it("should detect a neutral sentiment") {
-          detectSentiment("I'm watching a movie") should equal(NEUTRAL)
-        }
-
-        it("should detect a positive sentiment") {
-          detectSentiment("It was a nice experience.") should equal(POSITIVE)
-        }
-
-        it("should detect a very positive sentiment") {
-          detectSentiment("It was a very nice experience.") should equal(VERY_POSITIVE)
-        }
-      }
-    }
-
-  class SentimentAnalyzerSpec extends FunSpec with Matchers {
-
-    describe("sentiment analyzer") {
-
-      it("should return POSITIVE when input has positive emotion") {
-        val input = "Scala is a great general purpose language."
-        val sentiment = SentimentAnalyzer.mainSentiment(input)
-        sentiment should be(Sentiment.POSITIVE)
-      }
-    }*/
 
     timerStreamMin(10,"m")
     streamingSparkContext.stop(false, true)
@@ -301,7 +265,7 @@ object Streamer {
       val streamingSparkContext = new StreamingContext(sc, Seconds(10))
       // streamingSparkContext.start()
       var filters: Array[String]= new Array[String](10)
-      filters(1)= "#Trump"
+//      filters(1)= "#Trump"
       //filters(2)="#MachineLearning"
       //filters(3)="#BigData"
 
@@ -343,7 +307,6 @@ object Streamer {
 
       // do something: pause to avoid churning
       //streamingSparkContext.awaitTermination()
-    //blablabla
       streamingSparkContext.start()
 
       //set the current time
@@ -374,18 +337,7 @@ object Streamer {
 
     }
 
-}
 
-       //var conf1 = new SparkConf().setAppName("pre2").setMaster("local")
-       //var sc  = new SparkContext(conf1)
-       //var mytext=sc.textFile("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/2017_01_28_Test_Twitterproject.txt")
-       //Take all lines of Textfile:
-       //mytext.saveAsTextFile("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/")
-
-    // Access token
-    // YYkVU1DTSmomoQqLVwk1UropLV65fheRDscgHvXPPAQmZ
-    // Secret access token
-    // 43985647-tWJwBvJegg6jwzTJDVSmHPtuwcryJJYgwwhwug5oM
 
 
 
