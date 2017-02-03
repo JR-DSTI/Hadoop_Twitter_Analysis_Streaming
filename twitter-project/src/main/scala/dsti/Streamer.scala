@@ -6,29 +6,20 @@ package dsti
   */
 
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.Date._
 import java.util.regex.Pattern
 
-import org.apache.spark._
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-import org.apache.spark.SparkConf
-import org.apache.spark.streaming._
-import org.apache.spark.streaming.StreamingContext
-import org.apache.spark.streaming.twitter.TwitterUtils
 import twitter4j._
 import twitter4j.auth.AuthorizationFactory._
 import Twitter._
-//import org.apache.hive._
 import java.io._
 import java.util.UUID
+
+import edu.stanford.nlp.sentiment.SentimentUtils
 import org.joda.time.DateTime
-import java.util.Date._
+
 import scala.concurrent._
-//import org.apache.logging
-import org.apache.log4j
-import twitter4j.auth.{AuthorizationFactory, OAuthAuthorization}
-import twitter4j.conf.ConfigurationBuilder
+
 
 //Apache imports
   import org.apache.spark._
@@ -36,16 +27,19 @@ import twitter4j.conf.ConfigurationBuilder
   import org.apache.spark.SparkContext._
   import org.apache.spark.SparkConf
   import org.apache.spark.streaming._
-  import org.apache.spark.streaming.StreamingContext
+  //import org.apache.spark.streaming.StreamingContext
   import org.apache.spark.streaming.twitter.TwitterUtils
   import org.apache.log4j
+  //import org.apache.logging
+
   //import org.apache.hive._
 
 //Twitter imports
   import twitter4j._
   import twitter4j.auth.AuthorizationFactory._
   import Twitter._
-
+  import twitter4j.auth.{AuthorizationFactory, OAuthAuthorization}
+  import twitter4j.conf.ConfigurationBuilder
 
 //import org.apache.logging
   import twitter4j.auth.{AuthorizationFactory, OAuthAuthorization}
@@ -86,6 +80,77 @@ object Streamer {
 
   def main(args: Array[String]) {
 
+/*
+
+    //insert twitter credentials of Jonas:
+    //"consumerKey"
+    val consumerKey = "dS4yzE7tzvxD9cfrLCjjf8z6c"
+    //"consumerSecret"
+    val consumerSecret = "LHYbQDlWYoCMVJ9oqjh46m2sU21vcbfg4cT2qQh5uiyrfEHj18"
+    //"accessToken"
+    val accessToken = "43985647-tWJwBvJegg6jwzTJDVSmHPtuwcryJJYgwwhwug5oM"
+    //"accessTokenSecret"
+    val accessTokenSecret = "YYkVU1DTSmomoQqLVwk1UropLV65fheRDscgHvXPPAQmZ"
+
+
+    val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("local[2]")
+
+    val sc = new SparkContext(config)
+    sc.setLogLevel("WARN")
+
+    val ssc = new StreamingContext(sc, Seconds(20))
+
+    System.setProperty("twitter4j.oauth.consumerKey", consumerKey)
+    System.setProperty("twitter4j.oauth.consumerSecret", consumerSecret)
+    System.setProperty("twitter4j.oauth.accessToken", accessToken)
+    System.setProperty("twitter4j.oauth.accessTokenSecret", accessTokenSecret)
+
+    var bc = new ConfigurationBuilder()
+    bc.setDebugEnabled(true)
+      .setOAuthConsumerKey(consumerKey)
+      .setOAuthConsumerSecret(consumerSecret)
+      .setOAuthAccessToken(accessToken)
+      .setOAuthAccessTokenSecret(accessTokenSecret);
+
+    val auth = new OAuthAuthorization(bc.build)
+
+    val stream = TwitterUtils.createStream(ssc,Some(auth))
+    //val stream = TwitterUtils.createStream(streamingSparkContext, , filters).filter(_.getLang() == "en")
+
+    ssc.start() 
+    //timerStreamMin(10,"m") 
+
+
+    val tags = stream.flatMap { status =>
+      status.getHashtagEntities.map(_.getText)
+    }
+    tags.countByValue()
+      .foreachRDD { rdd =>
+        val now = org.joda.time.DateTime.now()
+        rdd
+          .sortBy(_._2)
+          .map(x => (x, now))
+          .saveAsTextFile(s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
+      }
+
+    val tweets = stream.filter { t =>
+      val tags = t.getText.split(" ").filter(_.startsWith("#")).map(_.toLowerCase)
+      tags.contains("#bigdata") && tags.contains("#food")
+    }
+
+    val data = tweets.map { status =>
+      val sentiment = com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiments(status.getText)
+      //used to be SentimentAnalysisUtils.detectSentiment()
+      val tags = status.getHashtagEntities.map(_.getText.toLowerCase)
+
+      (status.getText, sentiment.toString, tags)
+    }
+    data.saveAsTextFiles("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
+
+    ssc.stop()//(false,true) 
+
+  }
+*/
     //initialize()
 
     //var b = new bclass()
@@ -114,9 +179,9 @@ object Streamer {
       .setOAuthConsumerKey(consumerKey)
       .setOAuthConsumerSecret(consumerSecret)
       .setOAuthAccessToken(accessToken)
-      .setOAuthAccessTokenSecret(accessTokenSecret);
+      .setOAuthAccessTokenSecret(accessTokenSecret)
 
-    val auth = new OAuthAuthorization(bc.build)
+    var auth = new OAuthAuthorization(bc.build)
 
     //var twitterAuth =  new AuthorizationFactory().
 
@@ -129,18 +194,18 @@ object Streamer {
     //mylines.saveAsTextFile("file:///Users/assansanogo/Downloads/AT6")
 
     //open own spark streaming tab
-    val streamingSparkContext = new StreamingContext(sc, Seconds(10))
+    var streamingSparkContext = new StreamingContext(sc, Seconds(10))
     // streamingSparkContext.start()
     var filters: Array[String] = new Array[String](10)
-    filters(1) = "#Trump"
+    filters(1) ="#Trump"
     filters(2)="#trump"
     filters(3)="trump"
 
     //create stream with data that needs to be retrieved
-    val stream = TwitterUtils.createStream(streamingSparkContext, Some(auth), filters).filter(_.getLang() == "en")
+    var stream = TwitterUtils.createStream(streamingSparkContext, Some(auth), filters).filter(_.getLang() == "en")
 
     //val s = stream.map(l => (l.getText(), l.getCreatedAt(), l.getGeoLocation(), l.isRetweeted(), l.getUser(), l.getFavoriteCount()))
-    val s = stream.map(l => (l.getText()))
+    var s = stream.map(l => (l.getText()))
     s.saveAsTextFiles("file:///Users/assansanogo/Downloads/pre/") // do something
     // pause to avoid churning
     //streamingSparkContext.awaitTermination()
@@ -209,12 +274,9 @@ object Streamer {
 
 //create OAuth for twitter access
 
-      val auth = new OAuthAuthorization(bc.build)
+    //var auth = new OAuthAuthorization(bc.build)
 
-
-
-
-    for (el <- directories) {
+    /*for (el <- directories) {
       var pattern4: String = "(http.*)"
       var mytext = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/pre/" + el.toString()).map(l => (l._2))
        .map(l => l.replace("|", "    "))
@@ -239,7 +301,7 @@ object Streamer {
         mytext
           .map(l => l.split("\\s").mkString("_")).map(l => l.split("_").filter(l => l.contains("#")).mkString(" ")).map(l => l.replace("\\.*", ""))
           .saveAsTextFile("file:///Users/assansanogo/Downloads/outY/" + DateTime.now().toString())
-   }
+   }*/
 
     fileInput = "/Users/assansanogo/Downloads/outY/"
     directories = listMyFolders(fileInput)
@@ -255,16 +317,16 @@ object Streamer {
 
      //var file3 = new File("/Users/assansanogo/Downloads/outZ/")
      //directories= file3.list(my_filter)
-     var  mytext4= sc.textFile("/Users/assansanogo/Downloads/outZ/*/part*")
+     var  mytext4= sc.textFile("/Users/assansanogo/Downloads/outZ/part*")
      var myString= mytext4.collect()
      var mytext5=sc.parallelize(myString)
      mytext5.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/")
      //directories= file3.list(my_filter)
 
       //open own spark streaming tab context
-      val streamingSparkContext = new StreamingContext(sc, Seconds(10))
+      //var streamingSparkContext = new StreamingContext(sc, Seconds(10))
       // streamingSparkContext.start()
-      var filters: Array[String]= new Array[String](10)
+      //var filters: Array[String]= new Array[String](10)
 //      filters(1)= "#Trump"
       //filters(2)="#MachineLearning"
       //filters(3)="#BigData"
@@ -272,11 +334,11 @@ object Streamer {
       //create stream with data that needs to be retrieved
 //      val stream = TwitterUtils.createStream(streamingSparkContext, Some(auth),filters) // w/ filters
 // w/o filters (for trendsearch)
-      val stream = TwitterUtils.createStream(streamingSparkContext, None)
+      //var stream = TwitterUtils.createStream(streamingSparkContext, None)
 
       //define what attributes the tweets need to have
       //val s= stream.map(l=>(l.getUser(),l.getText(),l.getCreatedAt(),l.getGeoLocation(),l.getPlace(), l.isRetweeted(),l.getFavoriteCount(),l.getHashtagEntities))
-      val tags = stream.flatMap { status =>
+      var tags = stream.flatMap { status =>
         status.getHashtagEntities.map(_.getText)
       }
 
@@ -286,24 +348,24 @@ object Streamer {
 
       tags.countByValue()
         .foreachRDD { rdd =>
-          val now = org.joda.time.DateTime.now()
+          var now = org.joda.time.DateTime.now()
           rdd
             .sortBy(_._2)
             .map(x => (x, now))
             .saveAsTextFile("file:///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Trending3/")
         }
 
-      val tweets = stream.filter {t =>
-        val tags2 = t.getText.split(" ").filter(_.startsWith("#")).map(_.toLowerCase)
+      var tweets = stream.filter {t =>
+        var tags2 = t.getText.split(" ").filter(_.startsWith("#")).map(_.toLowerCase)
         tags2.contains("#bigdata") && tags2.contains("#food")
       }
 
-      val data = tweets.map { status =>
-        val sentiment = SentimentUtils.detectSentiment(status.getText)
-        val tags2 = status.getHashtagEntities.map(_.getText.toLowerCase)
+      /*var data = tweets.map { status =>
+        var sentiment = SentimentUtils.detectSentiment(status.getText)
+        var tags2 = status.getHashtagEntities.map(_.getText.toLowerCase)
 
-        (status.getText, sentiment.toString, tags)
-      }
+        (status.getText, sentiment.toString(), tags)
+      }*/
 
       // do something: pause to avoid churning
       //streamingSparkContext.awaitTermination()
@@ -326,20 +388,19 @@ object Streamer {
       streamingSparkContext.stop(false,true)
 
 
-     /*for (el <- directories) {
-       var mytext3 = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/outZ/" + el.toString())
+    /*for (el <- directories) {
+      var mytext3 = sc.wholeTextFiles("file:///Users/assansanogo/Downloads/outZ/" + el.toString())
 
-       file3.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/"+ DateTime.now().toString())
-     }*/
+      file3.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/"+ DateTime.now().toString())
+    }*/
+
+
+
 
 
 
 
     }
-
-
-
-
 
 
 }

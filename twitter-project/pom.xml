@@ -56,17 +56,17 @@
       <version>1.13</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_${scala.tools.version}</artifactId>
-      <version>2.0.M6-SNAP8</version>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.scalatest</groupId>-->
+      <!--<artifactId>scalatest_${scala.tools.version}</artifactId>-->
+      <!--<version>2.0.M6-SNAP8</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
       <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11 -->
       <dependency>
           <groupId>org.scalatest</groupId>
-          <artifactId>scalatest_2.11</artifactId>
-          <version>3.0.1</version>
+          <artifactId>scalatest_2.10</artifactId>
+          <version>3.0.0</version>
       </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
@@ -168,6 +168,8 @@
             <goals> <goal>single</goal> </goals>
           </execution> </executions>
       </plugin>
+      <!-- Add here the com.shekhargulati.sentiment_analyzer and other -->
+
     </plugins>
   </build>
 </project>
