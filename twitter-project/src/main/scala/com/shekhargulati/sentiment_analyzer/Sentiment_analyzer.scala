@@ -9,6 +9,7 @@ import twitter4j.conf.ConfigurationBuilder
 import twitter4j._
 import twitter4j.auth.AuthorizationFactory._
 import Twitter._
+import edu.stanford.nlp.util.PropertiesUtils
 import twitter4j._
 
 import scala.concurrent._
@@ -119,25 +120,39 @@ object Sentiment_analyzer{
         case Some(text) if !text.isEmpty => com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiments(text)
         case _ => throw new IllegalArgumentException("input can't be null or empty")
       }
-    def getSentiment(input: String): Sentiment = Option(input) match {
+
+    def getSentiment(input: String): String = Option(input) match {
       case Some(text) if !text.isEmpty => com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiment(text)
       case _ => throw new IllegalArgumentException("input can't be null or empty")
     }
-      var trySen="I like Assan and his incredible work."
 
-      //print(getSentiment(trySen).mkString)
+      var trySen="I hate Trump, he must DIE."
+      print(trySen+"\n")
+      print("Sentiment: "+getSentiment(trySen))
 
+      trySen="\nI loved this great feeling."
+      print(trySen+"\n")
+      print("Sentiment: "+getSentiment(trySen))
+
+      /*val props = new Properties()
+      props.setProperty("annotators", "tokenize, ssplit, parse, sentiment") //used to be ssplit
+      val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
+      val annotation: Annotation = pipeline.process("this is so awesome() I love melanie. asdf." +
+        "habbens only to me \n i guess")
+      val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
+      print("\nThe annotation = " + annotation.toString() + ", and the sentences = "+ sentences.mkString)//
+*/
       //print(com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiments(trySen).mkString)
 
-      var data = tweets.map { status =>
-        var sentiment = getSentiment(status.getText)//com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiment(status.getText)
+      var data = tweets.map {status =>
+        var sentiment = com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiment(status.getText) //getSentiment(status.getText)
         //used to be SentimentAnalysisUtils.detectSentiment()
         var tags = status.getHashtagEntities.map(_.getText().toLowerCase)
 
         /*for (x <- sentiment) {
           (status.getText, x, tags)  // however you want to format it
         }*/
-        (status.getGeoLocation,status.getPlace,status.getCreatedAt(),status.getLang(),status.getText(), sentiment.toString(), tags.mkString)
+        (status.getUser,status.getGeoLocation,status.getPlace,status.getLang(),status.getCreatedAt(),status.getText(), sentiment.toString(), tags.mkString(" "))
         /*for (sent <- sentiment)(
           sent.saveAsTextFiles("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
           )*/
@@ -184,49 +199,134 @@ class SentimentAnalyzerSpec extends FunSpec with Matchers {
   describe("sentiment analyzer") {
 //difference equal and be?
     //no value of NOT_UNDERSTOOD in Sentiment()?
-
-    it("should return POSITIVE when input has positive emotion") {
-      val input = "Scala is a great general purpose language."
+/*    it("should detect NOT_UNDERSTOOD sentiment") {
+      val input = ""
       val sentiment = SentimentAnalyzer.mainSentiment(input)
-      sentiment should be(Sentiment.POSITIVE)
+      sentiment should be(Sentiment.NOT_UNDERSTOOD)
+    }*/
+//
+//    it("should detect a VERY_NEGATIVE sentiment") {
+//      val input = "I am feeling very very sad and totally bad frustrated."
+//      val sentiment = SentimentAnalyzer.mainSentiment(input)
+//      sentiment should equal(Sentiment.VERY_NEGATIVE)
+//    }
+
+    it("should detect a VERY_NEGATIVE sentiment") {
+      val input = "I hate Trump, he must DIE."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.VERY_NEGATIVE)
     }
+    /*it("should detect a VERY_NEGATIVE sentiment") {
+      val input = "This is fucking shit and sucks."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.VERY_NEGATIVE)
+    }
+
+    it("should detect a VERY_NEGATIVE sentiment") {
+      val input = "Worst possible thing that could've happened."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.VERY_NEGATIVE)
+    }
+
+    it("should detect a VERY_NEGATIVE sentiment") {
+      val input = "I am feeling very sad and frustrated."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.VERY_NEGATIVE)
+    }*/
 
     it("should return NEGATIVE when input has negative emotion") {
       val input = "Dhoni laments bowling, fielding errors in series loss"
       val sentiment = SentimentAnalyzer.mainSentiment(input)
-      sentiment should be(Sentiment.NEGATIVE)
+      sentiment should equal(Sentiment.NEGATIVE)
+    }
+
+    it("should return NEGATIVE when input has negative emotion") {
+      val input = "Man, i am losing every single game."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.NEGATIVE)
+    }
+
+    it("should return NEGATIVE when input has negative emotion") {
+      val input = "I can't believe this mistake still fails to be corrected."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.NEGATIVE)
+    }
+
+    it("should return NEGATIVE when input has negative emotion") {
+      val input = "The newspaper spoke in an unfriendly way about the poor guy."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.NEGATIVE)
     }
 
     it("should return NEUTRAL when input has no emotion") {
       val input = "I am reading a book"
       val sentiment = SentimentAnalyzer.mainSentiment(input)
-      sentiment should be(Sentiment.NEUTRAL)
+      sentiment should equal(Sentiment.NEUTRAL)
     }
 
-    it("should detect not understood sentiment") {
-      val input = ""
+    it("should return NEUTRAL when input has no emotion") {
+      val input = "A banana is yellow."
       val sentiment = SentimentAnalyzer.mainSentiment(input)
-      sentiment should be(Sentiment.NOT_UNDERSTOOD)
+      sentiment should equal(Sentiment.NEUTRAL)
     }
 
-    it("should detect a negative sentiment") {
-      val input = "I am feeling very sad and frustrated."
+    it("should return NEUTRAL when input has no emotion") {
+      val input = "We will leave soon."
       val sentiment = SentimentAnalyzer.mainSentiment(input)
-      sentiment should be(Sentiment.VERY_NEGATIVE)
+      sentiment should equal(Sentiment.NEUTRAL)
     }
 
-    it("should detect a positive sentiment") {
+    it("should return NEUTRAL when input has no emotion") {
+      val input = "The review has been shared throughout newspapers."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.NEUTRAL)
+    }
+
+    it("should detect a POSITIVE sentiment") {
       val input = "It was a nice experience."
       val sentiment = SentimentAnalyzer.mainSentiment(input)
-      sentiment should be(Sentiment.POSITIVE)
+      sentiment should equal(Sentiment.POSITIVE)
     }
 
-    it("should detect a very positive sentiment") {
+    it("should detect a POSITIVE sentiment") { //used to be return POSITIVE when input has positive emotion
+      val input = "Scala is a great general purpose language."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.POSITIVE)
+    }
+
+    it("should detect a POSITIVE sentiment") {
+      val input = "This made me happy all day."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.POSITIVE)
+    }
+
+    it("should detect a POSITIVE sentiment") { //used to be return POSITIVE when input has positive emotion
+    val input = "What a wonderful idea!"
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.POSITIVE)
+    }
+
+    it("should detect a VERY_POSITIVE sentiment") {
       val input = "It was a very nice experience."
       val sentiment = SentimentAnalyzer.mainSentiment(input)
-      sentiment should be(Sentiment.VERY_POSITIVE)
+      sentiment should equal(Sentiment.VERY_POSITIVE)
     }
 
+    it("should detect a VERY_POSITIVE sentiment") {
+      val input = "I loved this great feeling."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.VERY_POSITIVE)
+    }
+    it("should detect a VERY_POSITIVE sentiment") {
+      val input = "This is the most amazing thing I've ever seen."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.VERY_POSITIVE)
+    }
+    it("should detect a VERY_POSITIVE sentiment") {
+      val input = "Astonishing, how much passion and love came up with this idea."
+      val sentiment = SentimentAnalyzer.mainSentiment(input)
+      sentiment should equal(Sentiment.VERY_POSITIVE)
+    }
 
   }
 }
@@ -235,10 +335,10 @@ object Sentiment extends Enumeration {
 
     type Sentiment = Value
 
-    val POSITIVE, NEGATIVE, NEUTRAL, NOT_UNDERSTOOD, VERY_NEGATIVE, VERY_POSITIVE = Value
+    val   VERY_NEGATIVE,NEGATIVE, NEUTRAL, POSITIVE,  VERY_POSITIVE = Value //NOT_UNDERSTOOD,
 
     def toSentiment(sentiment: Int): Sentiment = sentiment match {
-      case -1 => Sentiment.NOT_UNDERSTOOD
+      //case 0 => Sentiment.NOT_UNDERSTOOD
       case 0 => Sentiment.VERY_NEGATIVE
       case 1 => Sentiment.NEGATIVE
       case 2 => Sentiment.NEUTRAL
@@ -251,36 +351,56 @@ object SentimentAnalyzer {
 
   val props = new Properties()
   props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")
+
   val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
+/*  val pipeline: StanfordCoreNLP = new StanfordCoreNLP(PropertiesUtils.asProperties(
+    "annotators", "tokenize,ssplit,pos,lemma,parse,natlog",
+    "ssplit.isOneSentence", "true",
+    "parse.model", "edu/stanford/nlp/models/srparser/englishSR.ser.gz",
+    "tokenize.language", "en"))*/
 
   def mainSentiment(input: String): Sentiment = Option(input) match {
-    case Some(text) if !text.isEmpty => extractSentiment(text)
+    case Some(text) if !text.isEmpty => extractSentimentLongestSentence(text)
     case _ => throw new IllegalArgumentException("input can't be null or empty")
   }
 
 
-  private def extractSentimentLongestSentence(text: String): Sentiment = {
+  def extractSentimentLongestSentence(text: String): Sentiment = {
     val (_, sentiment) = extractSentiments(text)
       .maxBy { case (sentence, _) => sentence.length }
     sentiment
   }
 
-  /*def extractSentiment(text: String): Sentiment = {
-    val annotation: Annotation = pipeline.process(text)
-    val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
-    sentences.toString(sentence => (sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])))
-       { case (tree) => (Sentiment.toSentiment(RNNCoreAnnotations.getPredictedClass(tree))) }
-
-  }*/
-
-  def extractSentiments(text: String): List[(String, Sentiment)] = {
+  def extractSentiment(text: String): String = {
     val annotation: Annotation = pipeline.process(text)
     val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
     sentences
       .map(sentence => (sentence, sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])))
       .map { case (sentence, tree) => (sentence.toString, Sentiment.toSentiment(RNNCoreAnnotations.getPredictedClass(tree))) }
-      .toList
+      .map(l=>l._2)
+        .toString()
   }
+//val (_,sentiment) =extractSentiments(sentences.toString)
+//    val (_, sentiment) =extractSentiments(text)
+//      .maxBy {case (sentence,_)=> sentence.toLowerCase}
+//    sentiment
+      //.map(_._2)
+
+    /*sentences
+      .map(sentence => (sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])))
+      .map{ case (sentence,tree) => (Sentiment.toSentiment(RNNCoreAnnotations.getPredictedClass(tree))) }
+      .to*/
+
+
+    def extractSentiments(text: String): List[(String, Sentiment)] = {
+      val annotation: Annotation = pipeline.process(text)
+      val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
+      sentences
+        .map(sentence => (sentence, sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])))
+        .map { case (sentence, tree) => (sentence.toString, Sentiment.toSentiment(RNNCoreAnnotations.getPredictedClass(tree))) }
+        .toList
+    }
+
 
 
 }
