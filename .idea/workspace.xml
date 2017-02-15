@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="25e5376d-b0c1-45c6-a388-d7eaa10525bd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_opencsv_opencsv_3_9.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_beanutils_commons_beanutils_1_7_0.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_beanutils_commons_beanutils_1_9_3.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_collections_commons_collections_3_2_1.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_collections_commons_collections_3_2_2.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/twitter-project.iml" afterPath="$PROJECT_DIR$/twitter-project.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/twitter-project/pom.xml" afterPath="$PROJECT_DIR$/twitter-project/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala" afterPath="$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala" afterPath="$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala" />
     </list>
     <ignored path="$PROJECT_DIR$/twitter-project/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -30,8 +27,8 @@
       <file leaf-file-name="Streamer.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-24">
-              <caret line="322" column="73" lean-forward="false" selection-start-line="321" selection-start-column="5" selection-end-line="322" selection-end-column="73" />
+            <state relative-caret-position="2160">
+              <caret line="139" column="0" lean-forward="false" selection-start-line="139" selection-start-column="0" selection-end-line="139" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -40,12 +37,12 @@
       <file leaf-file-name="Sentiment_analyzer.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="232">
-              <caret line="198" column="305" lean-forward="true" selection-start-line="198" selection-start-column="305" selection-end-line="198" selection-end-column="305" />
+            <state relative-caret-position="226">
+              <caret line="308" column="31" lean-forward="true" selection-start-line="308" selection-start-column="31" selection-end-line="308" selection-end-column="31" />
               <folding>
                 <element signature="e#92#132#0" expanded="true" />
-                <element signature="e#10659#11033#0" expanded="false" />
-                <element signature="e#17711#22836#0" expanded="false" />
+                <element signature="e#10862#11236#0" expanded="false" />
+                <element signature="e#19548#24673#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -54,8 +51,8 @@
       <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/twitter-project/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-10">
-              <caret line="89" column="30" lean-forward="false" selection-start-line="89" selection-start-column="19" selection-end-line="89" selection-end-column="30" />
+            <state relative-caret-position="288">
+              <caret line="12" column="35" lean-forward="false" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -93,6 +90,7 @@
       <find>saveAsTextFile</find>
       <find>saveAsTextFile(</find>
       <find>mytext4.collect()</find>
+      <find>count</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -115,9 +113,9 @@
         <option value="$PROJECT_DIR$/twitter-project/src/main/scala/dsti/sentiment_analyzer.scala" />
         <option value="$PROJECT_DIR$/twitter-project/src/test/scala/samples/scalatest.scala" />
         <option value="$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/sentiment_analyzer.scala" />
+        <option value="$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/myString.scala" />
         <option value="$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala" />
         <option value="$PROJECT_DIR$/twitter-project/pom.xml" />
-        <option value="$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/myString.scala" />
         <option value="$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala" />
       </list>
     </option>
@@ -237,7 +235,7 @@
     <panes />
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Font" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.language" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.25383544" />
@@ -572,9 +570,8 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3971341" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3971341" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297619" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -584,13 +581,14 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27021495" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27021495" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297619" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -599,20 +597,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala</url>
-          <line>303</line>
-          <properties />
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala</url>
-          <line>304</line>
-          <properties />
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-      </breakpoints>
       <option name="time" value="9" />
     </breakpoint-manager>
     <watches-manager />
@@ -622,6 +606,42 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1824">
+          <caret line="76" column="90" lean-forward="false" selection-start-line="76" selection-start-column="90" selection-end-line="76" selection-end-column="90" />
+          <folding>
+            <element signature="e#92#132#0" expanded="true" />
+            <element signature="e#10862#11236#0" expanded="false" />
+            <element signature="e#19548#24673#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/twitter-project/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2136">
+          <caret line="89" column="30" lean-forward="false" selection-start-line="89" selection-start-column="19" selection-end-line="89" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -660,8 +680,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#92#132#0" expanded="true" />
-            <element signature="e#10659#11033#0" expanded="false" />
-            <element signature="e#17711#22836#0" expanded="false" />
+            <element signature="e#10862#11236#0" expanded="false" />
+            <element signature="e#19548#24673#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -707,18 +727,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="87" column="0" lean-forward="false" selection-start-line="87" selection-start-column="0" selection-end-line="87" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#3828#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#1959#1960#0" expanded="false" />
-            <element signature="e#1979#1980#0" expanded="false" />
-            <element signature="e#2081#2082#0" expanded="false" />
-            <element signature="e#2118#2119#0" expanded="false" />
-            <element signature="e#2261#2262#0" expanded="false" />
-            <element signature="e#2323#2324#0" expanded="false" />
-            <element signature="e#3804#3805#0" expanded="false" />
-            <element signature="e#3823#3824#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -726,55 +734,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="117" column="0" lean-forward="false" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1746#1747#0" expanded="false" />
-            <element signature="e#1778#1779#0" expanded="false" />
-            <element signature="e#4498#4499#0" expanded="false" />
-            <element signature="e#4539#4540#0" expanded="false" />
-            <element signature="e#4918#4919#0" expanded="false" />
-            <element signature="e#4984#4985#0" expanded="false" />
-            <element signature="e#5046#5047#0" expanded="false" />
-            <element signature="e#5075#5076#0" expanded="false" />
-            <element signature="e#7302#7303#0" expanded="false" />
-            <element signature="e#7323#7324#0" expanded="false" />
-            <element signature="e#7933#7934#0" expanded="false" />
-            <element signature="e#7993#7994#0" expanded="false" />
-            <element signature="e#11457#11458#0" expanded="false" />
-            <element signature="e#11498#11499#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/twitter-project/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-10">
-          <caret line="89" column="30" lean-forward="false" selection-start-line="89" selection-start-column="19" selection-end-line="89" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/myString.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/myString.scala" />
     <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.10.5/scala-library-2.10.5-sources.jar!/scala/Predef.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="207">
           <caret line="85" column="7" lean-forward="false" selection-start-line="85" selection-start-column="7" selection-end-line="85" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-24">
-          <caret line="322" column="73" lean-forward="false" selection-start-line="321" selection-start-column="5" selection-end-line="322" selection-end-column="73" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -782,7 +749,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="1204" column="0" lean-forward="false" selection-start-line="1204" selection-start-column="0" selection-end-line="1204" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -790,7 +756,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="65" column="0" lean-forward="false" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -798,7 +763,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="88" column="0" lean-forward="false" selection-start-line="88" selection-start-column="0" selection-end-line="88" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -806,7 +770,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="212" column="0" lean-forward="false" selection-start-line="212" selection-start-column="0" selection-end-line="212" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -814,10 +777,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="167">
           <caret line="1141" column="0" lean-forward="false" selection-start-line="1141" selection-start-column="0" selection-end-line="1141" selection-end-column="0" />
-          <folding>
-            <element signature="e#25063#25064#0" expanded="false" />
-            <element signature="e#25102#25103#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -825,7 +784,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="744" column="0" lean-forward="false" selection-start-line="744" selection-start-column="0" selection-end-line="744" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -833,21 +791,33 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="84">
           <caret line="105" column="24" lean-forward="false" selection-start-line="105" selection-start-column="24" selection-end-line="105" selection-end-column="24" />
-          <folding>
-            <marker date="1486153396000" expanded="false" signature="967:1051" ph="..." />
-            <marker date="1486153396000" expanded="false" signature="2600:2659" ph="..." />
-          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2160">
+          <caret line="139" column="0" lean-forward="false" selection-start-line="139" selection-start-column="0" selection-end-line="139" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/twitter-project/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="12" column="35" lean-forward="false" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="232">
-          <caret line="198" column="305" lean-forward="true" selection-start-line="198" selection-start-column="305" selection-end-line="198" selection-end-column="305" />
+        <state relative-caret-position="226">
+          <caret line="308" column="31" lean-forward="true" selection-start-line="308" selection-start-column="31" selection-end-line="308" selection-end-column="31" />
           <folding>
             <element signature="e#92#132#0" expanded="true" />
-            <element signature="e#10659#11033#0" expanded="false" />
-            <element signature="e#17711#22836#0" expanded="false" />
+            <element signature="e#10862#11236#0" expanded="false" />
+            <element signature="e#19548#24673#0" expanded="false" />
           </folding>
         </state>
       </provider>

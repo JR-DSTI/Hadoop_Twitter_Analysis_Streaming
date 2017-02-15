@@ -4,13 +4,13 @@
   <artifactId>twitter-project</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
-  <description>My wonderfull scala app</description>
-  <inceptionYear>2010</inceptionYear>
+  <description>Scala app to stream</description>
+  <inceptionYear>2017</inceptionYear>
   <licenses>
     <license>
-      <name>My License</name>
-      <url>http://....</url>
-      <distribution>repo</distribution>
+      <name>DSTI licensed (c)</name>
+      <url>http://datasciencetech.institute</url>
+      <distribution>repo in GitHub?</distribution>
     </license>
   </licenses>
 

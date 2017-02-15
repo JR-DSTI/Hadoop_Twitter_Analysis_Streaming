@@ -11,11 +11,13 @@ import twitter4j.auth.AuthorizationFactory._
 import Twitter._
 import com.opencsv.CSVWriter
 import edu.stanford.nlp.util.PropertiesUtils
+import org.apache.spark.rdd.RDD
 import twitter4j._
 
 import scala.concurrent._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
+
 import scala.util.control.Breaks
 import scala.util.control.Breaks._
 
@@ -72,7 +74,7 @@ object Sentiment_analyzer{
     //"accessTokenSecret"
     val accessTokenSecret = "YYkVU1DTSmomoQqLVwk1UropLV65fheRDscgHvXPPAQmZ"
 
-    val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("local[1]")
+    val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("local[2]")
 
     val sc = new SparkContext(config)
     sc.setLogLevel("WARN")
@@ -111,6 +113,10 @@ object Sentiment_analyzer{
           rdd
             .sortBy(_._2)
             .map(x => (x, now))
+            .map(l=>l.toString().replaceAll("\\(",""))
+            .map(l=>l.replaceAll("\\)",""))
+            .map(l=>l.replaceAll("\\n",""))
+            .map(l=>l.trim)
             .saveAsTextFile(s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trending/")
         }
 
@@ -241,7 +247,7 @@ object Sentiment_analyzer{
 
 
     ssc.start()
-    timerStreamMin(30,"m")
+    timerStreamMin(5,"m")
     //close all operations gracefully
     ssc.stop(false,true)
 
@@ -280,72 +286,92 @@ object Sentiment_analyzer{
     var mytext5=sc.parallelize(fileColl)
     mytext5.saveAsTextFile(s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped")
 
-    for (el <- directories) {
-      /*var mytext3 = sc.wholeTextFiles(fileInput + el.toString()).map(l=>l._2).
-      map(l=>l.split("\\s").filter(l=>l.startsWith("#")).mkString(","))
-        .flatMap(l=>l.split(","))
-      var mytext3 = sc.wholeTextFiles(fileInput + el.toString()).map(l => l._2).map(l => l.split("\\H").mkString(","))
-        .flatMap(l => l.split(","))
-      var uniqueKey = UUID.randomUUID()
-      mytext3.saveAsTextFile(fileInput + uniqueKey.toString())*/
-
-      breakable {
-        if (listMyFolders(fileInput + "/" + el.toString + "/").contains("part")) {
-          //var sName = sc.textFile(fileInput + "/" + el.toString + "/part*").name
-          var mytext4 = sc.textFile(fileInput + el.toString + "/part*")
-          var fileColl = mytext4.collect()
-          var mytext5=sc.parallelize(fileColl)
-          mytext5.saveAsTextFile(s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")//fileInput+"Solution/")
-
-          //do following for all text files: in folder
-          val part0 = Source.fromFile(fileInput + el.toString + "/part*").getLines
-          //var concatFiles = concatFiles + part0.toList
-          //myString= myString:::part0.toList
-          myString= List.concat(myString, part0.toList)
-          print(myString.toString())
-
-        } else {
-          break() //throw new IllegalArgumentException("Input can't be null or empty or matching 0 files")
-        }
-
-
-        //        var sName=sc.textFile(fileInput + "/" + el.toString + "/part*").name
-        //        if (sc.textFile(fileInput + "/" + el.toString + "/part*").name == null) {
-        //          var mytext4 = sc.textFile(fileInput + "/" + el.toString + "/part*")
-        //          var myString = mytext4.collect()
-        //        }else{
-        //          break()
-        //        }
-        //
-        //
-
-         /*match {
-
-//        case sc.textFile(fileInput + "/" + el.toString + "/part*") if !text.isEmpty => com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiments(text)
-//        case _ => throw new IllegalArgumentException("input can't be null or empty")
-          case (sName) if listMyFolders(fileInput + "/" + el.toString + "/").contains("part")=>
-            var sName=sc.textFile(fileInput + "/" + el.toString + "/part*").name
-            var mytext4 = sc.textFile(fileInput + "/" + el.toString + "/part*")
-            //myString = mytext4.collect()
-
-            //do following for all text files: in folder
-            val part0 = Source.fromFile(fileInput+"/"+el.toString +"/part*").getLines
-            //var concatFiles = concatFiles + part0.toList
-            myString = myString + part0.toString()
-          case _ => break()//throw new IllegalArgumentException("Input can't be null or empty or matching 0 files")
-          }*/
-      }
+    //add the header to the data set
+    def addHeader(rdd2:RDD[String],header2:RDD[String]):Unit= {
+      header2.union(rdd2).repartition(1).saveAsTextFile("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles")
     }
-      /*if (sc.textFile(fileInput+"/"+el.toString +"/part*").count()!=0){
-        var mytext4= sc.textFile(fileInput+"/"+el.toString +"/part*")
-        var myString= mytext4.collect()
-      }*/
 
-      //add
-      myString.foreach(p => bw.write(p + "\n"))
+    val rdd2 = sc.textFile("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped/part-00000")
+    val header2 = sc.parallelize(Array("User_geoLoc, Tweet_geoLocLat, Tweet_geoLocLon, Tweet_Country, Tweet_Place, Tweet_Text, Tweet_sentiment, Tweet_sentimentValue, Tweet_tags, Tweet_Language, Tweet_CreatedAtDate, Tweet_CreatedAtMonth, Tweet_CreatedAtYear, Tweet_CreatedAtTime,Tweet_Contributors,Tweet_FavoriteCount,Tweet_RetweetCount,Tweet_isFavorited"))
 
-      //Close the buffered writer
-      bw.close
+    addHeader(rdd2,header2)
+
+
+    //save file  as a csv file
+    var fileFinal = Source.fromFile("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000").getLines.toList
+    val partFinal = new File("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000.csv")
+
+    var bwriter = new BufferedWriter(new FileWriter(partFinal))
+    fileFinal.foreach(p => bwriter.write(p + "\n"))
+
+    bwriter.close()
+//    data.rdd.repartition(1).saveAsTextFile("s3n://bucket-name/location")
+//    for (el <- directories) {
+//      /*var mytext3 = sc.wholeTextFiles(fileInput + el.toString()).map(l=>l._2).
+//      map(l=>l.split("\\s").filter(l=>l.startsWith("#")).mkString(","))
+//        .flatMap(l=>l.split(","))
+//      var mytext3 = sc.wholeTextFiles(fileInput + el.toString()).map(l => l._2).map(l => l.split("\\H").mkString(","))
+//        .flatMap(l => l.split(","))
+//      var uniqueKey = UUID.randomUUID()
+//      mytext3.saveAsTextFile(fileInput + uniqueKey.toString())*/
+//
+//      breakable {
+//        if (listMyFolders(fileInput + "/" + el.toString + "/").contains("part")) {
+//          //var sName = sc.textFile(fileInput + "/" + el.toString + "/part*").name
+//          var mytext4 = sc.textFile(fileInput + el.toString + "/part*")
+//          var fileColl = mytext4.collect()
+//          var mytext5=sc.parallelize(fileColl)
+//          mytext5.saveAsTextFile(s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")//fileInput+"Solution/")
+//
+//          //do following for all text files: in folder
+//          val part0 = Source.fromFile(fileInput + el.toString + "/part*").getLines
+//          //var concatFiles = concatFiles + part0.toList
+//          //myString= myString:::part0.toList
+//          myString= List.concat(myString, part0.toList)
+//          print(myString.toString())
+//
+//        } else {
+//          break() //throw new IllegalArgumentException("Input can't be null or empty or matching 0 files")
+//        }
+//
+//
+//        //        var sName=sc.textFile(fileInput + "/" + el.toString + "/part*").name
+//        //        if (sc.textFile(fileInput + "/" + el.toString + "/part*").name == null) {
+//        //          var mytext4 = sc.textFile(fileInput + "/" + el.toString + "/part*")
+//        //          var myString = mytext4.collect()
+//        //        }else{
+//        //          break()
+//        //        }
+//        //
+//        //
+//
+//         /*match {
+//
+////        case sc.textFile(fileInput + "/" + el.toString + "/part*") if !text.isEmpty => com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiments(text)
+////        case _ => throw new IllegalArgumentException("input can't be null or empty")
+//          case (sName) if listMyFolders(fileInput + "/" + el.toString + "/").contains("part")=>
+//            var sName=sc.textFile(fileInput + "/" + el.toString + "/part*").name
+//            var mytext4 = sc.textFile(fileInput + "/" + el.toString + "/part*")
+//            //myString = mytext4.collect()
+//
+//            //do following for all text files: in folder
+//            val part0 = Source.fromFile(fileInput+"/"+el.toString +"/part*").getLines
+//            //var concatFiles = concatFiles + part0.toList
+//            myString = myString + part0.toString()
+//          case _ => break()//throw new IllegalArgumentException("Input can't be null or empty or matching 0 files")
+//          }*/
+//      }
+//    }
+//      /*if (sc.textFile(fileInput+"/"+el.toString +"/part*").count()!=0){
+//        var mytext4= sc.textFile(fileInput+"/"+el.toString +"/part*")
+//        var myString= mytext4.collect()
+//      }*/
+//
+//      //add
+//      myString.foreach(p => bw.write(p + "\n"))
+//
+//      //Close the buffered writer
+//      bw.close
 
       // /Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/part-00001
 

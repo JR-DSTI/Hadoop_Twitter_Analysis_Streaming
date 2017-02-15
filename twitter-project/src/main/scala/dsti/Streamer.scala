@@ -319,8 +319,8 @@ object Streamer {
      //directories= file3.list(my_filter)
      var  mytext4= sc.textFile("/Users/assansanogo/Downloads/outZ/part*")
      var myString= mytext4.collect()
-     var mytext5=sc.parallelize(myString)
-     mytext5.saveAsTextFile("file:///Users/assansanogo/Downloads/outZZ/")
+
+
      //directories= file3.list(my_filter)
 
       //open own spark streaming tab context
