@@ -9,7 +9,7 @@
         <module name="twitter-project" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.7">
       <module name="twitter-project" target="1.6" />
     </bytecodeTargetLevel>
   </component>

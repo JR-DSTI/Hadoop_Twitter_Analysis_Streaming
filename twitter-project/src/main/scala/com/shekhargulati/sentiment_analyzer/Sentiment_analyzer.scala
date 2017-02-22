@@ -74,7 +74,7 @@ object Sentiment_analyzer{
     //"accessTokenSecret"
     val accessTokenSecret = "YYkVU1DTSmomoQqLVwk1UropLV65fheRDscgHvXPPAQmZ"
 
-    val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("local[2]")
+    val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("yarn-client") //yarn-cluster
 
     val sc = new SparkContext(config)
     sc.setLogLevel("WARN")
@@ -117,7 +117,7 @@ object Sentiment_analyzer{
             .map(l=>l.replaceAll("\\)",""))
             .map(l=>l.replaceAll("\\n",""))
             .map(l=>l.trim)
-            .saveAsTextFile(s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trending/")
+            .saveAsTextFile(s"/user/jonas/twitterproject/Tweets_Trending/") //s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trending/")
         }
 
 
@@ -127,7 +127,7 @@ object Sentiment_analyzer{
       }
     //val stream = TwitterUtils.createStream(streamingSparkContext, Some(auth), filters).filter(_.getLang() == "en")
 
-      tweets.saveAsTextFiles("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trump_raw/")
+      tweets.saveAsTextFiles("/user/jonas/twitterproject/Tweets_Trump_raw/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trump_raw/")
 
     def getSentiments(input: String): List[(String, Sentiment)] = Option(input) match {
         case Some(text) if !text.isEmpty => com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiments(text)
@@ -210,7 +210,7 @@ object Sentiment_analyzer{
       .map(l=>l.replaceAll("\\)",""))
       .map(l=>l.replaceAll("\\n",""))
       .map(l=>l.trim)
-      .saveAsTextFiles("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
+      .saveAsTextFiles("/user/jonas/twitterproject/Tweets_Sentiment")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
 
     //data.saveAsObjectFiles("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment_objectfiles/")
 
@@ -269,43 +269,44 @@ object Sentiment_analyzer{
     }
 
     //List all the directories in a given path
-    var fileInput: String="/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/"
+    var fileInput: String="/user/jonas/twitterproject/Tweets_Sentiment/" //"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/"
     var directories: Array[String]=listMyFolders(fileInput)
 
     //fileInput = "/Users/assansanogo/Downloads/outY/"
     //directories = listMyFolders(fileInput)
     //var mytext5 =sc.makeRDD("","")// new RDD[String]
 
-    //create new file
-    val finalTxtFile = new File("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/2017_02_05_Output_Sentiment_Location")
-    //create buffered writer
-    val bw = new BufferedWriter(new FileWriter(finalTxtFile))
+//    //create new file
+//    val finalTxtFile = new File("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/2017_02_05_Output_Sentiment_Location")
+//    //create buffered writer
+//    val bw = new BufferedWriter(new FileWriter(finalTxtFile))
 
     var mytextFinal = sc.textFile(fileInput+ "/*/*")
     var fileColl = mytextFinal.collect()
     var mytext5=sc.parallelize(fileColl)
-    mytext5.saveAsTextFile(s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped")
+    mytext5.saveAsTextFile(s"/user/jonas/twitterproject/Tweets_Sentiment/Output/")///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped")
 
     //add the header to the data set
     def addHeader(rdd2:RDD[String],header2:RDD[String]):Unit= {
-      header2.union(rdd2).repartition(1).saveAsTextFile("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles")
+      header2.union(rdd2).repartition(1).saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles")
     }
 
-    val rdd2 = sc.textFile("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped/part-00000")
+    val rdd2 = sc.textFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/output_header")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped/part-00000")
     val header2 = sc.parallelize(Array("User_geoLoc, Tweet_geoLocLat, Tweet_geoLocLon, Tweet_Country, Tweet_Place, Tweet_Text, Tweet_sentiment, Tweet_sentimentValue, Tweet_tags, Tweet_Language, Tweet_CreatedAtDate, Tweet_CreatedAtMonth, Tweet_CreatedAtYear, Tweet_CreatedAtTime,Tweet_Contributors,Tweet_FavoriteCount,Tweet_RetweetCount,Tweet_isFavorited"))
 
     addHeader(rdd2,header2)
 
 
     //save file  as a csv file
-    var fileFinal = Source.fromFile("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000").getLines.toList
-    val partFinal = new File("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000.csv")
+    var fileFinal = Source.fromFile("/user/jonas/twitterproject/Tweets_Sentiment/part-00000") //"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000").getLines.toList
+    val partFinal = new File("/user/jonas/twitterproject/Tweets_Sentiment/Output/OutputFile_"+ UUID.randomUUID().toString)+".csv"//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000.csv")
 
     var bwriter = new BufferedWriter(new FileWriter(partFinal))
     fileFinal.foreach(p => bwriter.write(p + "\n"))
 
     bwriter.close()
-//    data.rdd.repartition(1).saveAsTextFile("s3n://bucket-name/location")
+    //data.rdd.repartition(1).saveAsTextFile("/user/jonas/twitterproject/misc/")//"s3n://bucket-name/location")
+
 //    for (el <- directories) {
 //      /*var mytext3 = sc.wholeTextFiles(fileInput + el.toString()).map(l=>l._2).
 //      map(l=>l.split("\\s").filter(l=>l.startsWith("#")).mkString(","))
