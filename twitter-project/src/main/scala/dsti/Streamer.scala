@@ -51,7 +51,8 @@ import scala.concurrent._
   import scala.concurrent._
 
 //corenlp language proccessing:
-  import edu.stanford.nlp.simple._
+  //CHANGE import edu.stanford.nlp.simple._
+
   import edu.stanford.nlp._
   import sentiment.SentimentUtils._
   import org.scalatest.{FunSpec, Matchers}

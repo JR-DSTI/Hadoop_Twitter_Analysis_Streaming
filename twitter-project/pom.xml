@@ -83,7 +83,7 @@
       <dependency>
           <groupId>edu.stanford.nlp</groupId>
           <artifactId>stanford-corenlp</artifactId>
-          <version>3.6.0</version>
+          <version>3.4.1</version>
       </dependency>
       <!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
       <dependency>
@@ -94,7 +94,7 @@
       <dependency>
           <groupId>edu.stanford.nlp</groupId>
           <artifactId>stanford-corenlp</artifactId>
-          <version>3.6.0</version>
+          <version>3.4.1</version>
           <classifier>models</classifier>
       </dependency>
       <!--&lt;!&ndash; https://mvnrepository.com/artifact/joda-time/joda-time &ndash;&gt;-->
