@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="25e5376d-b0c1-45c6-a388-d7eaa10525bd" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala" afterPath="$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala" />
     </list>
     <ignored path="$PROJECT_DIR$/twitter-project/target/" />
@@ -25,7 +24,7 @@
       <file leaf-file-name="Streamer.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="552">
+            <state relative-caret-position="0">
               <caret line="73" column="0" lean-forward="false" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
               <folding>
                 <element signature="e#117#150#0" expanded="false" />
@@ -37,10 +36,10 @@
       <file leaf-file-name="Sentiment_analyzer.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4155">
-              <caret line="464" column="51" lean-forward="true" selection-start-line="464" selection-start-column="51" selection-end-line="464" selection-end-column="51" />
+            <state relative-caret-position="-330">
+              <caret line="313" column="51" lean-forward="true" selection-start-line="312" selection-start-column="4" selection-end-line="313" selection-end-column="51" />
               <folding>
-                <element signature="e#92#132#0" expanded="true" />
+                <element signature="e#102#142#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -49,7 +48,7 @@
       <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/twitter-project/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1728">
+            <state relative-caret-position="0">
               <caret line="85" column="24" lean-forward="false" selection-start-line="85" selection-start-column="24" selection-end-line="85" selection-end-column="24" />
               <folding>
                 <element signature="n#licenses#0;n#project#0;n#!!top" expanded="false" />
@@ -72,17 +71,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>scalatest</find>
-      <find>twitter-project</find>
-      <find>streamingSparkContext</find>
-      <find>.start(</find>
-      <find>val</find>
-      <find>Sentiment</find>
-      <find>start()</find>
-      <find>= new</find>
-      <find>if</find>
-      <find>directories =</find>
-      <find>saveAsTextFile(</find>
       <find>mytext4.collect()</find>
       <find>count</find>
       <find>joda-time</find>
@@ -102,6 +90,17 @@
       <find>/user/jonas/twitterproject/Tweets_Sentiment/OutputText</find>
       <find>new File(&quot;</find>
       <find>fileInput</find>
+      <find>user/jonas/twitterproject/Tweets_Sentiment</find>
+      <find>UUID</find>
+      <find>create</find>
+      <find>output_header</find>
+      <find>part-00000</find>
+      <find>regrouped</find>
+      <find>OutputHeader</find>
+      <find>/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/part-00000</find>
+      <find>fromFile</find>
+      <find>/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/</find>
+      <find>8020</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -352,7 +351,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.importing" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Diff &amp; Merge" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.25383544" />
@@ -700,7 +699,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12142857" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.051190477" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19761905" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -721,7 +720,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="9" />
+      <option name="time" value="10" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -765,7 +764,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#92#132#0" expanded="true" />
+            <element signature="e#102#142#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -817,7 +816,7 @@
         <state relative-caret-position="1824">
           <caret line="76" column="90" lean-forward="false" selection-start-line="76" selection-start-column="90" selection-end-line="76" selection-end-column="90" />
           <folding>
-            <element signature="e#92#132#0" expanded="true" />
+            <element signature="e#102#142#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -879,7 +878,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#92#132#0" expanded="true" />
+            <element signature="e#102#142#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -998,7 +997,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/dsti/Streamer.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="552">
+        <state relative-caret-position="0">
           <caret line="73" column="0" lean-forward="false" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
           <folding>
             <element signature="e#117#150#0" expanded="false" />
@@ -1008,17 +1007,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/twitter-project/src/main/scala/com/shekhargulati/sentiment_analyzer/Sentiment_analyzer.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4155">
-          <caret line="464" column="51" lean-forward="true" selection-start-line="464" selection-start-column="51" selection-end-line="464" selection-end-column="51" />
+        <state relative-caret-position="-330">
+          <caret line="313" column="51" lean-forward="true" selection-start-line="312" selection-start-column="4" selection-end-line="313" selection-end-column="51" />
           <folding>
-            <element signature="e#92#132#0" expanded="true" />
+            <element signature="e#102#142#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/twitter-project/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1728">
+        <state relative-caret-position="0">
           <caret line="85" column="24" lean-forward="false" selection-start-line="85" selection-start-column="24" selection-end-line="85" selection-end-column="24" />
           <folding>
             <element signature="n#licenses#0;n#project#0;n#!!top" expanded="false" />

@@ -4,62 +4,65 @@ package com.shekhargulati.sentiment_analyzer
   */
 
 
+//Twitter
 import twitter4j.auth.OAuthAuthorization
 import twitter4j.conf.ConfigurationBuilder
 import twitter4j._
 import twitter4j.auth.AuthorizationFactory._
 import Twitter._
-import com.opencsv.CSVWriter
-import edu.stanford.nlp.util.PropertiesUtils
-import org.apache.spark.rdd.RDD
-import twitter4j._
 
+//Scala imports
 import scala.concurrent._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
-
 import scala.util.control.Breaks
 import scala.util.control.Breaks._
+import scala.collection.convert.wrapAll._
+import scala.io.Source
 
-//corenlp language proccessing:
+//Java imports
 import java.util.Properties
 import java.util.Date._
 import java.util.regex.Pattern
 import java.text.SimpleDateFormat
 import java.io._
-import scala.io.Source
 import java.util.UUID
 
-import org.joda.time.DateTime
+//corenlp language proccessing:
 
 import com.shekhargulati.sentiment_analyzer.Sentiment.Sentiment
 import edu.stanford.nlp.ling.CoreAnnotations
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
 import edu.stanford.nlp.pipeline.{Annotation, StanfordCoreNLP}
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
+import edu.stanford.nlp.util.PropertiesUtils
 
-import scala.collection.convert.wrapAll._
-
+//Data processing
+import org.joda.time.DateTime
 import com.opencsv
+import com.opencsv.CSVWriter
 
 //Apache imports
 import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.streaming.{StreamingContext, _}
-import org.apache.spark.{SparkConf, SparkContext}
-//import org.apache.logging
-//import org.apache.hive._
 import org.apache.spark._
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming._
 import org.apache.log4j
-//import org.apache.logging
-//import org.apache.spark.sql.SQLContext
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
+import org.apache.spark.rdd.RDD
+import org.apache.hadoop.fs._
 
+
+//import org.apache.logging
+//import org.apache.hive._
+//import org.apache.logging
+//import org.apache.spark.sql.SQLContext
+//import org.apache.spark.{SparkConf, SparkContext}
 
 object Sentiment_analyzer{
 
@@ -77,13 +80,19 @@ object Sentiment_analyzer{
     //"accessTokenSecret"
     val accessTokenSecret = "YYkVU1DTSmomoQqLVwk1UropLV65fheRDscgHvXPPAQmZ"
 
+    //Set up a new Sparkconfig for the yarn master
     val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("yarn-client") //yarn-cluster //) //"local[2]"
 
+    //Set up a new Sparkcontext
     val sc = new SparkContext(config)
+
+    //Set the Logging level of the transactions
     sc.setLogLevel("WARN")
 
+    //Set the streaming context
     var ssc = new StreamingContext(sc, Seconds(20))
 
+    //Put the Twitter credentials
     System.setProperty("twitter4j.oauth.consumerKey", consumerKey)
     System.setProperty("twitter4j.oauth.consumerSecret", consumerSecret)
     System.setProperty("twitter4j.oauth.accessToken", accessToken)
@@ -99,39 +108,46 @@ object Sentiment_analyzer{
 
     var auth = new OAuthAuthorization(bc.build)
 
+    //Set array for filtering the twitter stream
     var filters: Array[String]= new Array[String](10)
     filters(1)= "#Trump"
     filters(2)="Trump"
     //filters(3)=""
 
-    //var stream = TwitterUtils.createStream(ssc,Some(auth))
-    val stream = TwitterUtils.createStream(ssc, Some(auth),filters).filter(_.getLang() == "en")
 
+    //create the stream of tweets and filter for english language
+    val stream = TwitterUtils.createStream(ssc, Some(auth),filters).filter(_.getLang() == "en")
+    //var stream = TwitterUtils.createStream(ssc,Some(auth))
+
+    //map tweets
      var tags = stream.flatMap { status =>
         status.getHashtagEntities.map(_.getText)
+     }
+
+    //Sort trending trending tweets by hashtags
+    tags.countByValue()
+      .foreachRDD { rdd =>
+        var now = org.joda.time.DateTime.now()
+        rdd
+          .sortBy(_._2)
+          .map(x => (x, now))
+          .map(l=>l.toString().replaceAll("\\(",""))
+          .map(l=>l.replaceAll("\\)",""))
+          .map(l=>l.replaceAll("\\n",""))
+          .map(l=>l.trim)
+          .saveAsTextFile(s"/user/jonas/twitterproject/Tweets_Trending/") //s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trending/")
       }
-      tags.countByValue()
-        .foreachRDD { rdd =>
-          var now = org.joda.time.DateTime.now()
-          rdd
-            .sortBy(_._2)
-            .map(x => (x, now))
-            .map(l=>l.toString().replaceAll("\\(",""))
-            .map(l=>l.replaceAll("\\)",""))
-            .map(l=>l.replaceAll("\\n",""))
-            .map(l=>l.trim)
-            .saveAsTextFile(s"/user/jonas/twitterproject/Tweets_Trending/") //s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trending/")
-        }
 
+    //set raw tweets filtering: possibility to filter tweets by certain keywords
+    var tweets = stream.filter { t =>
+      //var tags = t.getText.split(" ").filter(_.startsWith("#")).map(_.toLowerCase)
+      t.getText.contains("")
+    }
 
-      var tweets = stream.filter { t =>
-        //var tags = t.getText.split(" ").filter(_.startsWith("#")).map(_.toLowerCase)
-        t.getText.contains("") //&& tags.contains("#food")
-      }
-    //val stream = TwitterUtils.createStream(streamingSparkContext, Some(auth), filters).filter(_.getLang() == "en")
+    //save the raw tweets:
+    tweets.saveAsTextFiles("/user/jonas/twitterproject/Tweets_Trump_raw/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trump_raw/")
 
-      tweets.saveAsTextFiles("/user/jonas/twitterproject/Tweets_Trump_raw/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trump_raw/")
-
+    //Define functions to get the sentiments of the tweets
     def getSentiments(input: String): List[(String, Sentiment)] = Option(input) match {
         case Some(text) if !text.isEmpty => com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiments(text)
         case _ => throw new IllegalArgumentException("input can't be null or empty")
@@ -151,87 +167,57 @@ object Sentiment_analyzer{
 //      print(trySen+"\n")
 //      print("Sentiment: "+getSentiment(trySen)+"\n")
 
-
+    //map all tweets into appropriate form for analysis and preprocess them with removing spaces and commatas
     var data = tweets.map {status =>
-        var sentiment = com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiment(status.getText) //getSentiment(status.getText)
-        var sentimentValue=com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.convertSentimentToValue(sentiment)
-      //used to be SentimentAnalysisUtils.detectSentiment()
-        var tags = status.getHashtagEntities.map(_.getText().toLowerCase)
-        var statusText=status.getText().replaceAll("\\,","")
+      //Set the sentiment of the tweet's text (to improve the accuracy, a preprocessing of the text itself could be done)
+      var sentiment = com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiment(status.getText)
 
-      //geolocation might still have comma in it
-        //var geoLocUser=status.getUser.getLocation//.replaceAll("\\,"," ")
-        //var geoLocUserToString=status.getUser.getLocation.replaceAll("\\,","")
+      //Set the sentiment's integer value (0-very negative to 4-very positive)
+      var sentimentValue=com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.convertSentimentToValue(sentiment)
 
+      //collect all the Hashtags of the tweets
+      var tags = status.getHashtagEntities.map(_.getText().toLowerCase)
+
+      //Clean the text from commatas
+      var statusText=status.getText().replaceAll("\\,","")
+
+      //check if parameters a available, if y then set them, if n then set "Null"
+      //Tweets location
       var geoLocUserToString=Option(status.getUser).map{ _.getLocation}.getOrElse("Null")
-      //var geoLocUserToString=Option(status.getUser).map{ _.getLocation}.map{l=>l.replaceAll("\\,"," ")}.getOrElse(0)
       var geoLocUserToString2=Option(geoLocUserToString).map{l=>l.toString.replaceAll("\\,"," ")}.getOrElse("Null")
 
-        //var geoLocStat=status.getGeoLocation
-
-      //var geoLocLat=geoLocStat.getLatitude
-//        var geoLocLatString=geoLocLat.toString
-//        .replaceAll("\\,","\\*")
+      //GeoLoc Latitude
       var geoLocLatString=Option(status.getGeoLocation).map{ _.getLatitude}.getOrElse("Null")
 
-
-      //var geoLocLon=geoLocStat.getLongitude
-//      var geoLocLonString=geoLocLon.toString
-//        .replaceAll("\\,","\\*")
+      //GeoLoc Longitued
       var geoLocLonString=Option(status.getGeoLocation).map{ _.getLongitude}.getOrElse("Null")
 
+      //Country
       var statusCountryString=Option(status.getPlace).map{ _.getCountry}.getOrElse("Null")
       var statusCountryString2=Option(statusCountryString).map{l=>l.toString.replaceAll("\\,"," ")}.getOrElse("Null")
 
+      //Place
       var statusPlaceString=Option(status.getPlace).map{ _.getName}.getOrElse("Null")
       var statusPlaceString2=Option(statusPlaceString).map{l=>l.toString.replaceAll("\\,"," ")}.getOrElse("Null")
+
+      //Set the time format of the tweet for further processing (here suiting tableau)
       var df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
       var dateTimeTableau=df.format(status.getCreatedAt().getTime)
 
-      //        var geoLocLonString=""
-//        var geoLocLatString=""
-//
-//        if(geoLocStat!=null){
-//          var geoLocLat=geoLocStat.getLatitude
-//          var geoLocLatString=geoLocLat.toString
-//            .replaceAll("\\,","\\*")
-//
-//          var geoLocLon=geoLocStat.getLongitude
-//          var geoLocLonString=geoLocLon.toString
-//            .replaceAll("\\,","\\*")
-//        }
-           //geoLocLat,geoLocLon,*/
-        //(status.getUser,status.getGeoLocation,status.getPlace,status.getText(), sentiment.toString(), tags.mkString(" "))
-      //(geoLocUserToString, geoLocStat.getLatitude, geoLocStat.getLongitude, status.getPlace.getCountry, status.getPlace.getName, statusText, sentiment.toString, tags.mkString(" "), status.getLang,status.getCreatedAt())
-      //(geoLocUserToString2," ")
-      //(geoLocUserToString2, geoLocLatString, geoLocLonString, status.getPlace.getCountry, status.getPlace.getName, statusText, sentiment.toString, tags.mkString(" "), status.getLang,status.getCreatedAt())
-
-
+      //Return
       (geoLocUserToString2, geoLocLatString, geoLocLonString,statusCountryString2,statusPlaceString2, statusText, sentiment.toString, sentimentValue, tags.mkString(" "), status.getLang,status.getCreatedAt().getDate,status.getCreatedAt().getMonth,status.getCreatedAt().getYear ,dateTimeTableau,status.getContributors,status.getFavoriteCount,status.getRetweetCount,status.isFavorited)
 
+    }
 
-    }//in tableau: Dateparse('EEE MMM dd hh:mm:ss Z yyyy', [YourString])
-    // convertable in yyyy-MM-dd HH:mm:ss
-
+    //preprocess resulting data, removing brackets, new lines and spaces in the end and beginning
     data.map(l=>l.toString().replaceAll("\\(",""))
       .map(l=>l.replaceAll("\\)",""))
       .map(l=>l.replaceAll("\\n",""))
       .map(l=>l.trim)
-      .saveAsTextFiles("/user/jonas/twitterproject/Tweets_Sentiment")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
-
-    //data.saveAsObjectFiles("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment_objectfiles/")
+      .saveAsTextFiles("/user/jonas/twitterproject/Tweets_Sentiment/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
 
 
-    //data.csv
-    //var datardd=
-
-    //data.saveAsTextFiles("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
-    //cat /Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/part* > 2017_02_05_Output_Sentiment_Location.csv
-    //data.write.format("csv").save("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/2017_02_05_Output_Sentiment_Location.csv")
-    //data.write.repartition(1).format("com.databricks.spark.csv").option("header", "true").save("myfile.csv")
-
-    //data.coalesce(1, true).saveAsTextFile(path)
-
+    //function to set the Streaming duration:
     def timerStreamMin(a:Int,timeScale:String) {
       var t_s: Long = System.currentTimeMillis();
       var t_end: Long=0
@@ -252,9 +238,12 @@ object Sentiment_analyzer{
       }
     }
 
-
+    //Start the streaming process:
     ssc.start()
+
+    //Set the Streaming duration
     timerStreamMin(10,"s")
+
     //close all operations gracefully
     ssc.stop(false,true)
 
@@ -283,167 +272,100 @@ object Sentiment_analyzer{
     //directories = listMyFolders(fileInput)
     //var mytext5 =sc.makeRDD("","")// new RDD[String]
 
-
-
-
 //    //create new file
     //OldVersion// val finalTxtFile = new File("/user/jonas/twitterproject/Tweets_Sentiment/OutputText")
 //    //create buffered writer
     //OldVersion// val bw = new BufferedWriter(new FileWriter(finalTxtFile))
 
-    var mytextFinal = sc.textFile(fileInput+ "/*/*")
+    //Collect all files in the output folder to process them
+    var mytextFinal = sc.textFile("/user/jonas/twitterproject/Tweets_Sentiment/*/*")
     var fileColl = mytextFinal.collect()
     var mytext5=sc.parallelize(fileColl)
-    mytext5.saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/")///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped")
+    mytext5.repartition(1).saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/")///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped")
 
-    //add the header to the data set
+    //function to add header to the data set
     def addHeader(rdd2:RDD[String],header2:RDD[String]):Unit= {
-      header2.union(rdd2).repartition(1).saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles")
+      header2.union(rdd2).repartition(1).saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles")
     }
 
-
-    val rdd2 = sc.textFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/output_header")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped/part-00000")
+    //set and collect all the text files resulting from mytext5
+    val rdd2 = sc.textFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/*")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped/part-00000")
     val header2 = sc.parallelize(Array("User_geoLoc, Tweet_geoLocLat, Tweet_geoLocLon, Tweet_Country, Tweet_Place, Tweet_Text, Tweet_sentiment, Tweet_sentimentValue, Tweet_tags, Tweet_Language, Tweet_CreatedAtDate, Tweet_CreatedAtMonth, Tweet_CreatedAtYear, Tweet_CreatedAtTime,Tweet_Contributors,Tweet_FavoriteCount,Tweet_RetweetCount,Tweet_isFavorited"))
 
+    //add header to the data set
     addHeader(rdd2,header2)
 
-    val conf = new Configuration()
-    conf.set("fs.defaultFS", "hdfs://ec2-52-214-216-145.eu-west-1.compute.amazonaws.com:7180")
-    val fs= FileSystem.get(conf)
-    //fs.create(new Path("/tmp/mySample.txt"))
-    val finalTxtFile = fs.create(new Path("/user/jonas/twitterproject/Tweets_Sentiment/Output/OutputFile_"+ UUID.randomUUID().toString + ".csv"))//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000.csv") // OLD: "/user/jonas/twitterproject/Tweets_Sentiment/OutputText.txt"))
+    //Set the config to create new file/folders in the hdfs
+    val hdfs =FileSystem.get(new Configuration())
+    val workingDir=hdfs.getWorkingDirectory()
+    val newFolderPath= new Path("/user/jonas/twitterproject/Tweets_Sentiment/")
+
+    val totalFolderPath = Path.mergePaths(workingDir, newFolderPath)
+
+    //Delete existing Directory if available
+    if(hdfs.exists(totalFolderPath))
+    {
+      hdfs.delete(totalFolderPath, true);
+    }
+
+    val finalTxtFile = hdfs.create(new Path("/user/jonas/twitterproject/Tweets_Sentiment/Output/OutputFile_"+ UUID.randomUUID().toString + ".csv"))//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000.csv") // OLD: "/user/jonas/twitterproject/Tweets_Sentiment/OutputText.txt"))
+
+    //possible: fs.create(new Path("/tmp/mySample.txt"))
     //finalTxtFile.write("This is a test".getBytes)
 
-    //save file  as a csv file
-    var fileFinal = Source.fromFile("/user/jonas/twitterproject/Tweets_Sentiment/part-00000") //"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000").getLines.toList
-
-
-      //val partFinal = new File("/user/jonas/twitterproject/Tweets_Sentiment/Output/OutputFile_"+ UUID.randomUUID().toString + ".csv")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000.csv")
-
-    //var bwriter = new BufferedWriter(new FileWriter(partFinal))
-
-    var bwriter = new PrintWriter(finalTxtFile)
-    fileFinal.foreach(p => bwriter.write(p + "\n"))
-
-    bwriter.close()
-    //data.rdd.repartition(1).saveAsTextFile("/user/jonas/twitterproject/misc/")//"s3n://bucket-name/location")
-
-//    for (el <- directories) {
-      /*var mytext3 = sc.wholeTextFiles(fileInput + el.toString()).map(l=>l._2).
-      map(l=>l.split("\\s").filter(l=>l.startsWith("#")).mkString(","))
-        .flatMap(l=>l.split(","))
-      var mytext3 = sc.wholeTextFiles(fileInput + el.toString()).map(l => l._2).map(l => l.split("\\H").mkString(","))
-        .flatMap(l => l.split(","))
-      var uniqueKey = UUID.randomUUID()
-      mytext3.saveAsTextFile(fileInput + uniqueKey.toString())*/
-
-//      breakable {
-//        if (listMyFolders(fileInput + "/" + el.toString + "/").contains("part")) {
-//          //var sName = sc.textFile(fileInput + "/" + el.toString + "/part*").name
-//          var mytext4 = sc.textFile(fileInput + el.toString + "/part*")
-//          var fileColl = mytext4.collect()
-//          var mytext5=sc.parallelize(fileColl)
-//          mytext5.saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/")//fileInput+"Solution/")
+//    saveAsCsv("hdfs://ec2-52-214-216-145.eu-west-1.compute.amazonaws.com:8020/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/","hdfs://ec2-52-214-216-145.eu-west-1.compute.amazonaws.com:8020/user/jonas/twitterproject/Tweets_Sentiment/OutputHeaderCSV/")
 //
-//          //do following for all text files: in folder
-//          val part0 = Source.fromFile(fileInput + el.toString + "/part*").getLines
-//          //var concatFiles = concatFiles + part0.toList
-//          //myString= myString:::part0.toList
-//          myString= List.concat(myString, part0.toList)
-//          print(myString.toString())
+//    def saveAsCsv(pathSource:String="/Users/assansanogo/Downloads/MLReady/part-00000",pathDestination:String="/Users/assansanogo/Downloads/MLReady/part-00000.csv")= {
+//      //save file  as a csv file
+//      var fileFinal = Source.fromFile(pathSource).getLines.toList
+//      val partFinal = new File(pathDestination)
 //
-//        } else {
-//          break() //throw new IllegalArgumentException("Input can't be null or empty or matching 0 files")
-//        }
-
-
-        //        var sName=sc.textFile(fileInput + "/" + el.toString + "/part*").name
-        //        if (sc.textFile(fileInput + "/" + el.toString + "/part*").name == null) {
-        //          var mytext4 = sc.textFile(fileInput + "/" + el.toString + "/part*")
-        //          var myString = mytext4.collect()
-        //        }else{
-        //          break()
-        //        }
-        //
-        //
-
-         /*match {
-
-//        case sc.textFile(fileInput + "/" + el.toString + "/part*") if !text.isEmpty => com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiments(text)
-//        case _ => throw new IllegalArgumentException("input can't be null or empty")
-          case (sName) if listMyFolders(fileInput + "/" + el.toString + "/").contains("part")=>
-            var sName=sc.textFile(fileInput + "/" + el.toString + "/part*").name
-            var mytext4 = sc.textFile(fileInput + "/" + el.toString + "/part*")
-            //myString = mytext4.collect()
-
-            //do following for all text files: in folder
-            val part0 = Source.fromFile(fileInput+"/"+el.toString +"/part*").getLines
-            //var concatFiles = concatFiles + part0.toList
-            myString = myString + part0.toString()
-          case _ => break()//throw new IllegalArgumentException("Input can't be null or empty or matching 0 files")
-          }*/
-//      }
+//      var bwriter = new BufferedWriter(new FileWriter(partFinal))
+//      fileFinal.foreach(p => bwriter.write(p + "\n"))
+//
+//      bwriter.close()
 //    }
-      /*if (sc.textFile(fileInput+"/"+el.toString +"/part*").count()!=0){
-        var mytext4= sc.textFile(fileInput+"/"+el.toString +"/part*")
-        var myString= mytext4.collect()
-      }*/
-
-      //add
-      //myString.foreach(p => bw.write(p + "\n"))
-
-      //Close the buffered writer
-      //bw.close
-
-      // /Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/part-00001
-
-    //test case of cocatenating two files:
-      /*val part0 = Source.fromFile("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/part-00000").getLines
-      val part1 = Source.fromFile("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/part-00001").getLines
-
-      val part2 = part0.toList ++ part1.toList
-
-      val part00002 = new File("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/part-00002")
-
-      val bw1 = new BufferedWriter(new FileWriter(part00002))
-      part2.foreach(p => bw1.write(p + "\n"))
-
-      //Close the buffered writer
-      bw1.close
-*/
-//    var mytext5=sc.parallelize(myString)
-//    mytext5.saveAsTextFile(fileInput+"/MyText5/")
-    
-    //var file3 = new File("/Users/assansanogo/Downloads/outZ/") 
-
-    //directories= file3.list(my_filter)
-    /*//do following for all text files: in folder
-    val part0 = Source.fromFile("part-00000.txt").getLines
+//
+//    //save file as a csv file
+//    var fileFinal = Source.fromFile("/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/") //"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000").getLines.toList
+//
+//    //new print writer to list all the tweet outputs in appropriate form
+//    var bwriter = new BufferedWriter(new FileWriter(finalTxtFile))
+//    fileFinal.foreach(p => bwriter.write(p + "\n"))
+//
+//    //Close the writer
+//    bwriter.close()
 
 
-    //add all files
-    val concatFiles = part0.toList ++ part1.toList
 
-    //create new file
-    val finalTxtFile = new File("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/2017_02_05_Output_Sentiment_Location")
-    //create buffered writer
-    val bw = new BufferedWriter(new FileWriter(finalTxtFile))
-    //add
-    concatFiles.foreach(p => bw.write(p + "\n"))
-    //Close the buffered writer
-    bw.close*/
+    //lift data into Hive:
+    // Option 1 ========================
+//    // Define which topics to read from
+//    val topic = "topic_twitter"
+//    val groupId = "group-1"
+//    val consumer = KafkaConsumer(topic, groupId, "localhost:2181")
+//
+//    //Create SparkContext
+//    val sparkContext = new SparkContext("local[2]", "KafkaConsumer")
+//
+//    //Create HiveContext
+//    val hiveContext = new org.apache.spark.sql.hive.HiveContext(sparkContext)
+//
+//    hiveContext.sql("CREATE EXTERNAL TABLE IF NOT EXISTS twitter_data (tweetId BIGINT, tweetText STRING, userName STRING, tweetTimeStamp STRING,   userLang STRING)")
+//    hiveContext.sql("CREATE EXTERNAL TABLE IF NOT EXISTS demo (foo STRING)")
+//    val hiveSql = "INSERT INTO TABLE twitter_data SELECT STACK( 1," +
+//      tweetID        +","  +
+//      tweetText      +"," +
+//      userName       +"," +
+//      tweetTimeStamp +","  +
+//      userLang + ") FROM demo limit 1"
+//
+//    hiveContext.sql(hiveSql)
 
-
-    //csvWriter to store all in csv
-    /*val csvWriter = new CSVWriter(new FileWriter("/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/2017_02_05_Output_Sentiment_Location.csv"), '\t')
-    //val entries = data.split(",");
-    //val  Splitting="\v".r //:Pattern=Pattern.compile("")
-    // feed in your array (or convert your data to an array)
-    val entries = "first\nsecond\nthird".split("\n")
-    //var entries="I dont get why this is not that easy.\nNot at all.".split(".")//data.toString.split(",")
-    csvWriter.writeNext(entries)
-    csvWriter.close()*/
-
+    // Option 2 ========================
+//    create external table test(key string, value string)
+//    ROW FORMAT DELIMITED FIELDS TERMINATED BY ';'
+//    LOCATION '/SOME/HDFS/LOCATION'
     print(0)
 
   }
@@ -454,13 +376,6 @@ object Sentiment_analyzer{
 class SentimentAnalyzerSpec extends FunSpec with Matchers {
 
   describe("sentiment analyzer") {
-//difference equal and be?
-    //no value of NOT_UNDERSTOOD in Sentiment()?
-/*    it("should detect NOT_UNDERSTOOD sentiment") {
-      val input = ""
-      val sentiment = SentimentAnalyzer.mainSentiment(input)
-      sentiment should be(Sentiment.NOT_UNDERSTOOD)
-    }*/
 
     it("should detect a VERY_NEGATIVE sentiment") {
       val input = "I hate Trump, he must DIE. I am feeling very very sad and totally bad frustrated."
@@ -586,10 +501,10 @@ object Sentiment extends Enumeration {
 
     type Sentiment = Value
 
-    val   VERY_NEGATIVE,NEGATIVE, NEUTRAL, POSITIVE, VERY_POSITIVE = Value //NOT_UNDERSTOOD,
+    val   VERY_NEGATIVE,NEGATIVE, NEUTRAL, POSITIVE, VERY_POSITIVE = Value
 
     def toSentiment(sentiment: Int): Sentiment = sentiment match {
-      //case 0 => Sentiment.NOT_UNDERSTOOD
+
       case 0 => Sentiment.VERY_NEGATIVE
       case 1 => Sentiment.NEGATIVE
       case 2 => Sentiment.NEUTRAL
@@ -604,11 +519,6 @@ object SentimentAnalyzer {
   props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")
 
   val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
-/*  val pipeline: StanfordCoreNLP = new StanfordCoreNLP(PropertiesUtils.asProperties(
-    "annotators", "tokenize,ssplit,pos,lemma,parse,natlog",
-    "ssplit.isOneSentence", "true",
-    "parse.model", "edu/stanford/nlp/models/srparser/englishSR.ser.gz",
-    "tokenize.language", "en"))*/
 
   def mainSentiment(input: String): Sentiment = Option(input) match {
     case Some(text) if !text.isEmpty => extractSentimentLongestSentence(text)
@@ -651,25 +561,8 @@ object SentimentAnalyzer {
     if(sent.toString()=="VERY_POSITIVE"){
       result=4
     }
-//    case 0 => Sentiment.VERY_NEGATIVE
-//    case 1 => Sentiment.NEGATIVE
-//    case 2 => Sentiment.NEUTRAL
-//    case 3 => Sentiment.POSITIVE
-//    case 4 => Sentiment.VERY_POSITIVE
     result
   }
-//val (_,sentiment) =extractSentiments(sentences.toString)
-//    val (_, sentiment) =extractSentiments(text)
-//      .maxBy {case (sentence,_)=> sentence.toLowerCase}
-//    sentiment
-      //.map(_._2)
-
-    /*sentences
-      .map(sentence => (sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])))
-      .map{ case (sentence,tree) => (Sentiment.toSentiment(RNNCoreAnnotations.getPredictedClass(tree))) }
-      .to*/
-
-
     def extractSentiments(text: String): List[(String, Sentiment)] = {
       val annotation: Annotation = pipeline.process(text)
       val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
