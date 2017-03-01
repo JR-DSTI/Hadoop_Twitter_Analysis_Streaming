@@ -56,17 +56,15 @@ import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 import org.apache.spark.rdd.RDD
 import org.apache.hadoop.fs._
-
-
-//import org.apache.logging
+import org.apache.spark.sql._
+//import org.apache.spark.sql.SparkSession
 //import org.apache.hive._
-//import org.apache.logging
-//import org.apache.spark.sql.SQLContext
-//import org.apache.spark.{SparkConf, SparkContext}
+
+
 
 object Sentiment_analyzer{
 
-  var myString= List[String]() //= new Seq[Char]
+  var myString= List[String]()
 
   def main(args: Array[String]): Unit = {
 
@@ -81,7 +79,7 @@ object Sentiment_analyzer{
     val accessTokenSecret = "YYkVU1DTSmomoQqLVwk1UropLV65fheRDscgHvXPPAQmZ"
 
     //Set up a new Sparkconfig for the yarn master
-    val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("yarn-client") //yarn-cluster //) //"local[2]"
+    val config = new SparkConf().setAppName("twitter-stream-sentiment").setMaster("yarn-client") //"yarn-cluster" //"local[2]"
 
     //Set up a new Sparkcontext
     val sc = new SparkContext(config)
@@ -117,7 +115,6 @@ object Sentiment_analyzer{
 
     //create the stream of tweets and filter for english language
     val stream = TwitterUtils.createStream(ssc, Some(auth),filters).filter(_.getLang() == "en")
-    //var stream = TwitterUtils.createStream(ssc,Some(auth))
 
     //map tweets
      var tags = stream.flatMap { status =>
@@ -135,17 +132,17 @@ object Sentiment_analyzer{
           .map(l=>l.replaceAll("\\)",""))
           .map(l=>l.replaceAll("\\n",""))
           .map(l=>l.trim)
-          .saveAsTextFile(s"/user/jonas/twitterproject/Tweets_Trending/") //s"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trending/")
+          .saveAsTextFile(s"/user/jonas/twitterproject/Tweets_Trending/")
       }
 
     //set raw tweets filtering: possibility to filter tweets by certain keywords
     var tweets = stream.filter { t =>
-      //var tags = t.getText.split(" ").filter(_.startsWith("#")).map(_.toLowerCase)
+      //Filter here
       t.getText.contains("")
     }
 
     //save the raw tweets:
-    tweets.saveAsTextFiles("/user/jonas/twitterproject/Tweets_Trump_raw/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Trump_raw/")
+    tweets.saveAsTextFiles("/user/jonas/twitterproject/Tweets_Trump_raw/")
 
     //Define functions to get the sentiments of the tweets
     def getSentiments(input: String): List[(String, Sentiment)] = Option(input) match {
@@ -158,16 +155,7 @@ object Sentiment_analyzer{
       case _ => throw new IllegalArgumentException("input can't be null or empty")
     }
 
-    //TestCases:
-//      var trySen="I hate Trump, he must clearly resign being the worst president."
-//      print(trySen+"\n")
-//      print("Sentiment: "+getSentiment(trySen))
-//
-//      trySen="\nI loved this great feeling."
-//      print(trySen+"\n")
-//      print("Sentiment: "+getSentiment(trySen)+"\n")
-
-    //map all tweets into appropriate form for analysis and preprocess them with removing spaces and commatas
+    //map all tweets into appropriate form for analysis and preprocess them with removing spaces and commas
     var data = tweets.map {status =>
       //Set the sentiment of the tweet's text (to improve the accuracy, a preprocessing of the text itself could be done)
       var sentiment = com.shekhargulati.sentiment_analyzer.SentimentAnalyzer.extractSentiment(status.getText)
@@ -214,7 +202,7 @@ object Sentiment_analyzer{
       .map(l=>l.replaceAll("\\)",""))
       .map(l=>l.replaceAll("\\n",""))
       .map(l=>l.trim)
-      .saveAsTextFiles("/user/jonas/twitterproject/Tweets_Sentiment/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/")
+      .saveAsTextFiles("/user/jonas/twitterproject/Tweets_Sentiment/")
 
 
     //function to set the Streaming duration:
@@ -242,7 +230,7 @@ object Sentiment_analyzer{
     ssc.start()
 
     //Set the Streaming duration
-    timerStreamMin(10,"s")
+    timerStreamMin(5,"m")
 
     //close all operations gracefully
     ssc.stop(false,true)
@@ -265,35 +253,26 @@ object Sentiment_analyzer{
     }
 
     //List all the directories in a given path
-    var fileInput: String="/user/jonas/twitterproject/Tweets_Sentiment/" //"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/"
+    var fileInput: String="/user/jonas/twitterproject/Tweets_Sentiment/"
     var directories: Array[String]=listMyFolders(fileInput)
-
-    //fileInput = "/Users/assansanogo/Downloads/outY/"
-    //directories = listMyFolders(fileInput)
-    //var mytext5 =sc.makeRDD("","")// new RDD[String]
-
-//    //create new file
-    //OldVersion// val finalTxtFile = new File("/user/jonas/twitterproject/Tweets_Sentiment/OutputText")
-//    //create buffered writer
-    //OldVersion// val bw = new BufferedWriter(new FileWriter(finalTxtFile))
 
     //Collect all files in the output folder to process them
     var mytextFinal = sc.textFile("/user/jonas/twitterproject/Tweets_Sentiment/*/*")
     var fileColl = mytextFinal.collect()
     var mytext5=sc.parallelize(fileColl)
-    mytext5.repartition(1).saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/")///Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped")
+    mytext5.repartition(1).saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/")
 
     //function to add header to the data set
     def addHeader(rdd2:RDD[String],header2:RDD[String]):Unit= {
-      header2.union(rdd2).repartition(1).saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles")
+      header2.union(rdd2).repartition(1).saveAsTextFile("/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/")
     }
 
     //set and collect all the text files resulting from mytext5
-    val rdd2 = sc.textFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/*")//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/regrouped/part-00000")
+    val rdd2 = sc.textFile("/user/jonas/twitterproject/Tweets_Sentiment/Output/*")
     val header2 = sc.parallelize(Array("User_geoLoc, Tweet_geoLocLat, Tweet_geoLocLon, Tweet_Country, Tweet_Place, Tweet_Text, Tweet_sentiment, Tweet_sentimentValue, Tweet_tags, Tweet_Language, Tweet_CreatedAtDate, Tweet_CreatedAtMonth, Tweet_CreatedAtYear, Tweet_CreatedAtTime,Tweet_Contributors,Tweet_FavoriteCount,Tweet_RetweetCount,Tweet_isFavorited"))
 
     //add header to the data set
-    addHeader(rdd2,header2)
+    addHeader(header2,rdd2)
 
     //Set the config to create new file/folders in the hdfs
     val hdfs =FileSystem.get(new Configuration())
@@ -308,33 +287,7 @@ object Sentiment_analyzer{
       hdfs.delete(totalFolderPath, true);
     }
 
-    val finalTxtFile = hdfs.create(new Path("/user/jonas/twitterproject/Tweets_Sentiment/Output/OutputFile_"+ UUID.randomUUID().toString + ".csv"))//"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000.csv") // OLD: "/user/jonas/twitterproject/Tweets_Sentiment/OutputText.txt"))
-
-    //possible: fs.create(new Path("/tmp/mySample.txt"))
-    //finalTxtFile.write("This is a test".getBytes)
-
-//    saveAsCsv("hdfs://ec2-52-214-216-145.eu-west-1.compute.amazonaws.com:8020/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/","hdfs://ec2-52-214-216-145.eu-west-1.compute.amazonaws.com:8020/user/jonas/twitterproject/Tweets_Sentiment/OutputHeaderCSV/")
-//
-//    def saveAsCsv(pathSource:String="/Users/assansanogo/Downloads/MLReady/part-00000",pathDestination:String="/Users/assansanogo/Downloads/MLReady/part-00000.csv")= {
-//      //save file  as a csv file
-//      var fileFinal = Source.fromFile(pathSource).getLines.toList
-//      val partFinal = new File(pathDestination)
-//
-//      var bwriter = new BufferedWriter(new FileWriter(partFinal))
-//      fileFinal.foreach(p => bwriter.write(p + "\n"))
-//
-//      bwriter.close()
-//    }
-//
-//    //save file as a csv file
-//    var fileFinal = Source.fromFile("/user/jonas/twitterproject/Tweets_Sentiment/OutputHeader/") //"/Users/12050jr/Dropbox/40_DSTI_Data Science Big Data/10_Classes/007_Hadoop Ecosystem/Project_Twitter/Output/Tweets_Sentiment/AssanMLFiles/part-00000").getLines.toList
-//
-//    //new print writer to list all the tweet outputs in appropriate form
-//    var bwriter = new BufferedWriter(new FileWriter(finalTxtFile))
-//    fileFinal.foreach(p => bwriter.write(p + "\n"))
-//
-//    //Close the writer
-//    bwriter.close()
+    val finalTxtFile = hdfs.create(new Path("/user/jonas/twitterproject/Tweets_Sentiment/Output/OutputFile_"+ UUID.randomUUID().toString + ".csv"))
 
 
 
@@ -346,11 +299,13 @@ object Sentiment_analyzer{
 //    val consumer = KafkaConsumer(topic, groupId, "localhost:2181")
 //
 //    //Create SparkContext
-//    val sparkContext = new SparkContext("local[2]", "KafkaConsumer")
+    //val sparkContext = sc //new SparkContext("local[2]", "KafkaConsumer")
 //
 //    //Create HiveContext
-//    val hiveContext = new org.apache.spark.sql.hive.HiveContext(sparkContext)
-//
+
+    //val hiveContext = new org.apache.spark.sql.hive.HiveContext(sparkContext)
+
+    //
 //    hiveContext.sql("CREATE EXTERNAL TABLE IF NOT EXISTS twitter_data (tweetId BIGINT, tweetText STRING, userName STRING, tweetTimeStamp STRING,   userLang STRING)")
 //    hiveContext.sql("CREATE EXTERNAL TABLE IF NOT EXISTS demo (foo STRING)")
 //    val hiveSql = "INSERT INTO TABLE twitter_data SELECT STACK( 1," +
